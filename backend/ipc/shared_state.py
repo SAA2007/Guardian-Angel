@@ -1,66 +1,45 @@
 """Guardian Angel -- Shared State for IPC
 
-Thread- and process-safe shared memory container using
-multiprocessing.Manager().  Passes bounding box results
-from detection to overlay without copying large frames.
+Thread-safe shared state using threading.Lock.
+All worker threads read/write through this class.
 
 Usage:
-    from multiprocessing import Manager
-    manager = Manager()
-    state = SharedState(manager)
+    state = SharedState()
     state.update_boxes([{"x": 10, "y": 20, ...}])
     boxes = state.get_boxes()
 """
 
+import threading
 
 
 class SharedState:
-    """Process-safe shared state for inter-process communication.
+    """Thread-safe shared state for inter-thread communication.
 
-    All attributes are backed by a multiprocessing.Manager()
-    so they can be safely read/written from any subprocess.
+    All attributes are protected by a single threading.Lock
+    so they can be safely read/written from any thread.
     """
 
-    def __init__(self, manager):
-        """Initialise shared state with Manager-backed structures.
-
-        Args:
-            manager: a multiprocessing.Manager() instance.
-        """
-        # Current bounding boxes from detection
-        self._boxes = manager.list()
-
-        # Audio trigger flag
-        self._audio_trigger = manager.Value("b", False)
-
-        # Global running flag — False signals all processes to stop
-        self._is_running = manager.Value("b", True)
-
-        # FPS metrics
-        self._fps_actual = manager.Value("d", 0.0)
-
-        # Total detection count
-        self._detection_count = manager.Value("i", 0)
-
-
+    def __init__(self):
+        """Initialise shared state with lock-protected fields."""
+        self._lock = threading.Lock()
+        self._boxes = []
+        self._audio_trigger = False
+        self._is_running = True
+        self._fps_actual = 0.0
+        self._detection_count = 0
 
     # ── Box operations ──────────────────────────────────────────
 
     def update_boxes(self, new_boxes):
         """Replace current boxes atomically.
 
-        Uses slice assignment which is a single Manager RPC
-        call — safe for concurrent reads from other processes.
-
         Args:
             new_boxes: list of box dicts, each containing
                 x, y, width, height, monitor_id, tier,
                 confidence, label.
         """
-        try:
-            self._boxes[:] = new_boxes
-        except Exception as e:
-            print("[SHARED-STATE] update_boxes error: {}".format(e))
+        with self._lock:
+            self._boxes = list(new_boxes)
 
     def get_boxes(self):
         """Return a copy of current bounding boxes.
@@ -68,7 +47,8 @@ class SharedState:
         Returns:
             list[dict]: copy of box list.
         """
-        return list(self._boxes)
+        with self._lock:
+            return list(self._boxes)
 
     # ── Audio trigger ───────────────────────────────────────────
 
@@ -78,7 +58,8 @@ class SharedState:
         Args:
             val: True if explicit audio detected.
         """
-        self._audio_trigger.value = val
+        with self._lock:
+            self._audio_trigger = val
 
     def get_audio_trigger(self):
         """Return audio trigger state.
@@ -86,30 +67,59 @@ class SharedState:
         Returns:
             bool: True if audio pipeline detected explicit content.
         """
-        return self._audio_trigger.value
+        with self._lock:
+            return self._audio_trigger
 
     # ── Lifecycle ───────────────────────────────────────────────
 
     def signal_stop(self):
-        """Signal all processes to stop."""
-        self._is_running.value = False
+        """Signal all threads to stop."""
+        with self._lock:
+            self._is_running = False
 
     def is_alive(self):
         """Check if the system should keep running.
 
         Returns:
-            bool: True if processes should continue.
+            bool: True if threads should continue.
         """
-        return self._is_running.value
+        with self._lock:
+            return self._is_running
 
     # ── Metrics ─────────────────────────────────────────────────
 
-    @property
-    def fps_actual(self):
-        """Proxy to the shared fps_actual Value."""
-        return self._fps_actual
+    def set_fps(self, fps):
+        """Set the current FPS value.
 
-    @property
-    def detection_count(self):
-        """Proxy to the shared detection_count Value."""
-        return self._detection_count
+        Args:
+            fps: current frames per second.
+        """
+        with self._lock:
+            self._fps_actual = fps
+
+    def get_fps(self):
+        """Return current FPS value.
+
+        Returns:
+            float: current frames per second.
+        """
+        with self._lock:
+            return self._fps_actual
+
+    def increment_detection_count(self, n):
+        """Increment total detection count.
+
+        Args:
+            n: number of detections to add.
+        """
+        with self._lock:
+            self._detection_count += n
+
+    def get_detection_count(self):
+        """Return total detection count.
+
+        Returns:
+            int: total detections since startup.
+        """
+        with self._lock:
+            return self._detection_count

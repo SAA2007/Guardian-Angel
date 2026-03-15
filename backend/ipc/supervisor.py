@@ -1,8 +1,8 @@
-"""Guardian Angel -- Process Supervisor (Process A)
+"""Guardian Angel -- Thread-based Supervisor
 
 Spawns and manages detection, overlay, and audio as
-subprocesses.  Monitors health and restarts crashed
-processes automatically.
+daemon threads sharing a single process.  Monitors
+health and can restart stopped threads.
 
 Usage:
     supervisor = ProcessSupervisor()
@@ -12,12 +12,9 @@ Usage:
     supervisor.stop()
 """
 
-import json
-import multiprocessing
 import os
 import sys
 import threading
-import time
 import traceback
 
 from .shared_state import SharedState
@@ -25,8 +22,6 @@ from .process_detection import run_detection_process
 from .process_overlay import run_overlay_process
 from .process_audio import run_audio_process
 
-
-# ── config helper ───────────────────────────────────────────────
 
 def _project_root():
     """Return the absolute project root path."""
@@ -36,14 +31,12 @@ def _project_root():
 
 
 class ProcessSupervisor:
-    """Process A — spawns and supervises all subprocesses.
+    """Spawns and supervises detection, overlay, and audio threads.
 
     Manages:
-        - Detection process (screen capture + NudeNet)
-        - Overlay process (Win32 transparent window)
-        - Audio process (WASAPI loopback + VAD + Whisper)
-
-    Automatically restarts any subprocess that crashes.
+        - Detection thread (screen capture + NudeNet)
+        - Overlay thread (Win32 transparent window)
+        - Audio thread (WASAPI loopback + VAD + Whisper)
     """
 
     def __init__(self, config_path=None):
@@ -57,200 +50,83 @@ class ProcessSupervisor:
                 _project_root(), "config.json"
             )
         self._config_path = config_path
-
-        # Force spawn method on Windows (required for pywin32)
-        try:
-            multiprocessing.set_start_method("spawn", force=True)
-        except RuntimeError:
-            pass  # already set
-
-        self._manager = multiprocessing.Manager()
-        self._state = SharedState(self._manager)
-
-        # Process registry
-        self._processes = {}
-        self._health_thread = None
-        self._health_running = False
-
-    def _spawn_process(self, name, target):
-        """Spawn a named subprocess.
-
-        Args:
-            name: process name (detection/overlay/audio).
-            target: callable entry point function.
-
-        Returns:
-            Process: the started subprocess.
-        """
-        p = multiprocessing.Process(
-            target=target,
-            args=(self._state, self._config_path),
-            name="GA-{}".format(name),
-            daemon=True,
-        )
-        p.start()
-        print("[SUPERVISOR] Started {} (PID {})".format(
-            name, p.pid
-        ))
-        return p
+        self._state = SharedState()
+        self._threads = {}
 
     def start(self):
-        """Spawn all 3 subprocesses and start health monitor."""
-        print("[SUPERVISOR] Starting all processes...")
+        """Spawn all 3 threads."""
+        print("[SUPERVISOR] Starting all threads...")
 
-        self._processes["detection"] = self._spawn_process(
-            "detection", run_detection_process
-        )
-        self._processes["overlay"] = self._spawn_process(
-            "overlay", run_overlay_process
-        )
-        self._processes["audio"] = self._spawn_process(
-            "audio", run_audio_process
-        )
-
-        # Start health monitor
-        self._health_running = True
-        self._health_thread = threading.Thread(
-            target=self._health_monitor, daemon=True
-        )
-        self._health_thread.start()
-
-        print("[SUPERVISOR] All processes started.")
-
-    def _health_monitor(self):
-        """Background thread — checks subprocess health every 5s.
-
-        Restarts any crashed subprocess automatically.
-        """
         targets = {
             "detection": run_detection_process,
             "overlay": run_overlay_process,
             "audio": run_audio_process,
         }
 
-        while self._health_running and self._state.is_alive():
-            time.sleep(5.0)
+        for name, target in targets.items():
+            t = threading.Thread(
+                target=target,
+                args=(self._state, self._config_path),
+                name="GA-{}".format(name),
+                daemon=True,
+            )
+            self._threads[name] = t
+            t.start()
+            print("[SUPERVISOR] Started {} thread".format(name))
 
-            for name, proc in list(self._processes.items()):
-                if proc is None:
-                    continue
-
-                if not proc.is_alive() and self._state.is_alive():
-                    exit_code = proc.exitcode
-                    print(
-                        "[SUPERVISOR] {} crashed (exit code {}). "
-                        "Restarting...".format(name, exit_code)
-                    )
-                    try:
-                        self._processes[name] = self._spawn_process(
-                            name, targets[name]
-                        )
-                        print(
-                            "[SUPERVISOR] {} restarted.".format(name)
-                        )
-                    except Exception:
-                        traceback.print_exc()
-                        print(
-                            "[SUPERVISOR] Failed to restart "
-                            "{}.".format(name)
-                        )
+        print("[SUPERVISOR] All threads started.")
 
     def stop(self):
-        """Stop all processes gracefully.
+        """Stop all threads gracefully.
 
-        Signals stop, waits up to 5 seconds, then force-kills
-        any remaining processes.
+        Signals stop, waits up to 5 seconds per thread.
         """
-        print("[SUPERVISOR] Stopping all processes...")
+        print("[SUPERVISOR] Stopping all threads...")
 
-        # Signal all to stop
         self._state.signal_stop()
-        self._health_running = False
 
-        # Wait for graceful shutdown
-        for name, proc in self._processes.items():
-            if proc is None or not proc.is_alive():
-                continue
-            proc.join(timeout=5.0)
-            if proc.is_alive():
+        for name, t in self._threads.items():
+            t.join(timeout=5.0)
+            if t.is_alive():
                 print(
-                    "[SUPERVISOR] Force-terminating {}...".format(name)
+                    "[SUPERVISOR] {} did not stop cleanly".format(
+                        name
+                    )
                 )
-                proc.terminate()
-                proc.join(timeout=2.0)
 
-        # Wait for health thread
-        if self._health_thread is not None:
-            self._health_thread.join(timeout=2.0)
-            self._health_thread = None
-
-        # Cleanup Manager
-        try:
-            self._manager.shutdown()
-        except Exception:
-            pass
-
-        self._processes.clear()
-        print("[SUPERVISOR] All processes stopped.")
+        self._threads.clear()
+        print("[SUPERVISOR] All threads stopped.")
 
     def get_status(self):
-        """Return current status of all subprocesses.
+        """Return current status of all threads.
 
         Returns:
-            dict: status information for all processes.
+            dict: status information for all threads.
         """
-        status = {
-            "detection_alive": False,
-            "overlay_alive": False,
-            "audio_alive": False,
-            "fps_actual": 0.0,
-            "detection_count": 0,
-            "audio_trigger": False,
+        return {
+            "detection_alive": self._threads.get(
+                "detection", threading.Thread()
+            ).is_alive(),
+            "overlay_alive": self._threads.get(
+                "overlay", threading.Thread()
+            ).is_alive(),
+            "audio_alive": self._threads.get(
+                "audio", threading.Thread()
+            ).is_alive(),
+            "fps_actual": self._state.get_fps(),
+            "detection_count": self._state.get_detection_count(),
+            "audio_trigger": self._state.get_audio_trigger(),
         }
 
-        proc_d = self._processes.get("detection")
-        if proc_d is not None:
-            status["detection_alive"] = proc_d.is_alive()
-
-        proc_o = self._processes.get("overlay")
-        if proc_o is not None:
-            status["overlay_alive"] = proc_o.is_alive()
-
-        proc_a = self._processes.get("audio")
-        if proc_a is not None:
-            status["audio_alive"] = proc_a.is_alive()
-
-        try:
-            status["fps_actual"] = float(
-                self._state.fps_actual.value
-            )
-        except Exception:
-            pass
-
-        try:
-            status["detection_count"] = int(
-                self._state.detection_count.value
-            )
-        except Exception:
-            pass
-
-        try:
-            status["audio_trigger"] = bool(
-                self._state.get_audio_trigger()
-            )
-        except Exception:
-            pass
-
-        return status
-
     def restart_process(self, name):
-        """Restart a single subprocess by name.
+        """Restart a single thread by name.
 
-        Terminates the process, waits up to 3 seconds,
-        force-kills if needed, then spawns a fresh one.
+        Can only restart a thread that has already stopped.
+        Daemon threads cannot be forcibly killed — they must
+        exit their run loop via shared_state.is_alive().
 
         Args:
-            name: process name (detection/overlay/audio).
+            name: thread name (detection/overlay/audio).
 
         Returns:
             bool: True if restarted successfully.
@@ -261,47 +137,33 @@ class ProcessSupervisor:
             "audio": run_audio_process,
         }
         if name not in targets:
-            print("[SUPERVISOR] Unknown process: {}".format(name))
+            print("[SUPERVISOR] Unknown thread: {}".format(name))
             return False
 
-        proc = self._processes.get(name)
-        if proc is not None and proc.is_alive():
-            print("[SUPERVISOR] Terminating {}...".format(name))
-            proc.terminate()
-            proc.join(timeout=3.0)
-            if proc.is_alive():
-                print("[SUPERVISOR] Force-killing {}...".format(
-                    name
-                ))
-                proc.kill()
-                proc.join(timeout=2.0)
+        old = self._threads.get(name)
+        if old and old.is_alive():
+            print(
+                "[SUPERVISOR] {} thread still running, "
+                "cannot restart cleanly".format(name)
+            )
+            return False
 
         try:
-            self._processes[name] = self._spawn_process(
-                name, targets[name]
+            t = threading.Thread(
+                target=targets[name],
+                args=(self._state, self._config_path),
+                name="GA-{}".format(name),
+                daemon=True,
             )
-            print("[SUPERVISOR] {} restarted.".format(name))
-
-            # Update PID file with new subprocess PID
-            try:
-                pid_file = os.path.join(
-                    _project_root(), "data", "guardian_angel.pid"
-                )
-                if os.path.exists(pid_file):
-                    with open(pid_file, "r") as f:
-                        pids = json.load(f)
-                    pids[name] = self._processes[name].pid
-                    with open(pid_file, "w") as f:
-                        json.dump(pids, f)
-            except Exception:
-                pass
-
+            self._threads[name] = t
+            t.start()
+            print("[SUPERVISOR] Restarted {} thread".format(name))
             return True
         except Exception:
             traceback.print_exc()
-            print("[SUPERVISOR] Failed to restart {}.".format(
-                name
-            ))
+            print(
+                "[SUPERVISOR] Failed to restart {}.".format(name)
+            )
             return False
 
     @property

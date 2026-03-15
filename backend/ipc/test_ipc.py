@@ -1,14 +1,11 @@
 """Guardian Angel -- IPC Integration Test
 
-Starts the ProcessSupervisor with all 3 subprocesses,
+Starts the ProcessSupervisor with all 3 threads,
 waits 8 seconds, prints status, then stops cleanly.
 
 This test runs on your real desktop — detection will
 capture your screen, overlay will open, audio will
 attempt WASAPI loopback.  No NSFW content needed.
-
-IMPORTANT: must be run with `if __name__ == "__main__":`
-guard — required for multiprocessing on Windows.
 
 Usage:
     python backend/ipc/test_ipc.py
@@ -35,7 +32,7 @@ def main():
     config_path = os.path.join(_project_root, "config.json")
     supervisor = ProcessSupervisor(config_path=config_path)
 
-    print("\nStarting all processes...")
+    print("\nStarting all threads...")
     supervisor.start()
 
     print("Running for 8 seconds...")
@@ -60,7 +57,7 @@ def main():
     for k, v in final.items():
         print("  {}: {}".format(k, v))
 
-    print("\nStopping all processes...")
+    print("\nStopping all threads...")
     supervisor.stop()
 
     print("IPC test complete.")

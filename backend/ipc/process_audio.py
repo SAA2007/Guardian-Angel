@@ -1,9 +1,9 @@
-"""Guardian Angel -- Audio Subprocess Entry Point
+"""Guardian Angel -- Audio Thread Entry Point
 
 Runs the AudioPipeline, writing trigger state to SharedState.
 Never crashes — logs errors and continues.
 
-This module is spawned as a subprocess by ProcessSupervisor.
+This module runs as a daemon thread inside ProcessSupervisor.
 """
 
 import os
@@ -20,10 +20,10 @@ def _project_root():
 
 
 def run_audio_process(shared_state, config_path):
-    """Entry point for the audio subprocess.
+    """Entry point for the audio thread.
 
     Args:
-        shared_state: SharedState instance (Manager-backed).
+        shared_state: SharedState instance (thread-safe).
         config_path: absolute path to config.json.
     """
     root = _project_root()
@@ -32,7 +32,7 @@ def run_audio_process(shared_state, config_path):
 
     from backend.audio.pipeline import AudioPipeline
 
-    print("[AUDIO] Subprocess started (PID {})".format(
+    print("[AUDIO] Thread started (PID {})".format(
         os.getpid()
     ))
 
@@ -53,13 +53,13 @@ def run_audio_process(shared_state, config_path):
 
     except Exception:
         traceback.print_exc()
-        print("[AUDIO] Fatal error in audio process.")
+        print("[AUDIO] Fatal error in audio thread.")
     finally:
         if pipeline is not None:
             try:
                 pipeline.stop()
             except Exception:
                 pass
-        print("[AUDIO] Subprocess exiting (PID {})".format(
+        print("[AUDIO] Thread exiting (PID {})".format(
             os.getpid()
         ))

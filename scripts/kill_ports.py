@@ -1,12 +1,10 @@
 """Guardian Angel -- Process Cleanup
 
-Kills all Guardian Angel processes by:
-1. Reading PID file (main + 3 subprocesses)
+Kills the Guardian Angel process by:
+1. Reading PID file (single main process PID)
 2. Port-based kill as fallback (8421, 8422)
-3. Scanning for any remaining guardian-angel python processes
 """
 
-import json
 import os
 import time
 
@@ -16,24 +14,24 @@ import psutil
 killed = []
 
 # ── Step 1: kill by PID file ────────────────────────────────────
-pid_file = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "data", "guardian_angel.pid"
-)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+pid_file = os.path.join(project_root, "data", "guardian_angel.pid")
+
 if os.path.exists(pid_file):
     try:
         with open(pid_file) as f:
-            pids = json.load(f)
-        for name, pid in pids.items():
-            try:
-                p = psutil.Process(int(pid))
-                p.kill()
-                killed.append("{} (PID {})".format(name, pid))
-            except Exception:
-                pass
+            pid = int(f.read().strip())
+        p = psutil.Process(pid)
+        p.kill()
+        killed.append("main (PID {})".format(pid))
         os.remove(pid_file)
     except Exception as e:
-        print("PID file error: {}".format(e))
+        print("PID kill failed: {}".format(e))
+        try:
+            os.remove(pid_file)
+        except Exception:
+            pass
 
 # ── Step 2: kill by port as fallback ────────────────────────────
 for port in [8421, 8422]:
@@ -48,22 +46,6 @@ for port in [8421, 8422]:
                     ))
                 except Exception:
                     pass
-    except Exception:
-        pass
-
-# ── Step 3: kill remaining guardian-angel python processes ──────
-for proc in psutil.process_iter(["pid", "name", "cmdline"]):
-    try:
-        if proc.info["name"] in ("python.exe", "python3.exe"):
-            cmdline = " ".join(proc.info["cmdline"] or [])
-            if "guardian-angel" in cmdline.lower():
-                if proc.pid != os.getpid():
-                    proc.kill()
-                    killed.append(
-                        "guardian-angel python (PID {})".format(
-                            proc.pid
-                        )
-                    )
     except Exception:
         pass
 

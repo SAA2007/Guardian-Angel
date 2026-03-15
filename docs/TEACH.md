@@ -169,3 +169,11 @@
 [2026-03-16 01:06:29] TEACH: Added detection_classes field to ConfigResponse and ConfigUpdateRequest.
 [2026-03-16 01:06:29] TEACH: New toggle panel for per-class detection control.
 [2026-03-16 01:06:29] TEACH: Added DetectionClassesPanel below ConfigPanel.
+[2026-03-16 01:27:16] TEACH: Replaced multiprocessing.Manager with threading.Lock for all shared state.
+[2026-03-16 01:27:16] TEACH: Replaced multiprocessing.Process with threading.Thread, removed Manager/health monitor.
+[2026-03-16 01:27:16] TEACH: Updated to thread-safe SharedState API (set_fps, increment_detection_count).
+[2026-03-16 01:27:16] TEACH: Updated to thread model, hold timing 2s default 4s for 2+ boxes.
+[2026-03-16 01:27:16] TEACH: Updated to thread model, logic unchanged.
+[2026-03-16 01:27:17] TEACH: Simplified PID file to single main PID, removed multiprocessing imports.
+[2026-03-16 01:27:17] TEACH: Updated to reflect threading model.
+[2026-03-16 01:27:17] TEACH: Simplified to plain-text single PID file.

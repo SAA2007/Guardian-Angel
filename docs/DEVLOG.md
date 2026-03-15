@@ -169,3 +169,11 @@
 [2026-03-16 01:06:29] PHASE:7-FIX | FILE:backend/api/models.py | ACTION:Added detection_classes field to ConfigResponse and ConfigUpdateRequest | STATUS:done
 [2026-03-16 01:06:29] PHASE:7-FIX | FILE:frontend/src/components/DetectionClassesPanel.jsx | ACTION:New toggle panel for per-class detection control | STATUS:done
 [2026-03-16 01:06:29] PHASE:7-FIX | FILE:frontend/src/App.jsx | ACTION:Added DetectionClassesPanel below ConfigPanel | STATUS:done
+[2026-03-16 01:27:16] PHASE:4-REFACTOR | FILE:backend/ipc/shared_state.py | ACTION:Replaced multiprocessing.Manager with threading.Lock for all shared state | STATUS:done
+[2026-03-16 01:27:16] PHASE:4-REFACTOR | FILE:backend/ipc/supervisor.py | ACTION:Replaced multiprocessing.Process with threading.Thread, removed Manager/health monitor | STATUS:done
+[2026-03-16 01:27:16] PHASE:4-REFACTOR | FILE:backend/ipc/process_detection.py | ACTION:Updated to thread-safe SharedState API (set_fps, increment_detection_count) | STATUS:done
+[2026-03-16 01:27:16] PHASE:4-REFACTOR | FILE:backend/ipc/process_overlay.py | ACTION:Updated to thread model, hold timing 2s default 4s for 2+ boxes | STATUS:done
+[2026-03-16 01:27:16] PHASE:4-REFACTOR | FILE:backend/ipc/process_audio.py | ACTION:Updated to thread model, logic unchanged | STATUS:done
+[2026-03-16 01:27:17] PHASE:4-REFACTOR | FILE:backend/main.py | ACTION:Simplified PID file to single main PID, removed multiprocessing imports | STATUS:done
+[2026-03-16 01:27:17] PHASE:4-REFACTOR | FILE:backend/ipc/test_ipc.py | ACTION:Updated to reflect threading model | STATUS:done
+[2026-03-16 01:27:17] PHASE:4-REFACTOR | FILE:scripts/kill_ports.py | ACTION:Simplified to plain-text single PID file | STATUS:done

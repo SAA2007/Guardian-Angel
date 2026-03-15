@@ -1,10 +1,10 @@
-"""Guardian Angel -- Detection Subprocess Entry Point
+"""Guardian Angel -- Detection Thread Entry Point
 
 Runs the DetectionPipeline in a loop, writing results to
 SharedState.  Never lets an unhandled exception crash the
-process -- logs and continues.
+thread -- logs and continues.
 
-This module is spawned as a subprocess by ProcessSupervisor.
+This module runs as a daemon thread inside ProcessSupervisor.
 """
 
 import json
@@ -31,10 +31,10 @@ def _load_config_safe(config_path):
 
 
 def run_detection_process(shared_state, config_path):
-    """Entry point for the detection subprocess.
+    """Entry point for the detection thread.
 
     Args:
-        shared_state: SharedState instance (Manager-backed).
+        shared_state: SharedState instance (thread-safe).
         config_path: absolute path to config.json.
     """
     # Ensure project root is importable
@@ -44,7 +44,7 @@ def run_detection_process(shared_state, config_path):
 
     from backend.detection.pipeline import DetectionPipeline
 
-    print("[DETECTION] Subprocess started (PID {})".format(
+    print("[DETECTION] Thread started (PID {})".format(
         os.getpid()
     ))
 
@@ -124,12 +124,14 @@ def run_detection_process(shared_state, config_path):
                 # Update metrics
                 try:
                     fps = pipeline.fps_manager.get_actual_fps()
-                    shared_state.fps_actual.value = fps
+                    shared_state.set_fps(fps)
                 except Exception:
                     pass
 
                 if results:
-                    shared_state.detection_count.value += len(results)
+                    shared_state.increment_detection_count(
+                        len(results)
+                    )
 
                 # ── B2: Heartbeat every 50 frames ───────────────
                 frame_counter += 1
@@ -141,7 +143,7 @@ def run_detection_process(shared_state, config_path):
                     print(
                         "[DETECTION-ALIVE] frame={} | fps={:.1f} | "
                         "sensitivity={} | scale={} | "
-                        "subprocess alive".format(
+                        "thread alive".format(
                             frame_counter,
                             hb_fps,
                             pipeline.detector._sensitivity,
@@ -157,13 +159,13 @@ def run_detection_process(shared_state, config_path):
 
     except Exception:
         traceback.print_exc()
-        print("[DETECTION] Fatal error in detection process.")
+        print("[DETECTION] Fatal error in detection thread.")
     finally:
         if pipeline is not None:
             try:
                 pipeline.stop()
             except Exception:
                 pass
-        print("[DETECTION] Subprocess exiting (PID {})".format(
+        print("[DETECTION] Thread exiting (PID {})".format(
             os.getpid()
         ))

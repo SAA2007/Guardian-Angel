@@ -1,9 +1,12 @@
-"""Guardian Angel -- Overlay Subprocess Entry Point
+"""Guardian Angel -- Overlay Thread Entry Point
 
 Reads bounding boxes from SharedState, updates the
 OverlayRenderer at ~60Hz.  Never crashes.
 
-This module is spawned as a subprocess by ProcessSupervisor.
+This module runs as a daemon thread inside ProcessSupervisor.
+The Win32 overlay renderer uses a message loop that runs
+inside this thread — this thread IS the dedicated Win32
+message thread.
 """
 
 import os
@@ -20,10 +23,10 @@ def _project_root():
 
 
 def run_overlay_process(shared_state, config_path):
-    """Entry point for the overlay subprocess.
+    """Entry point for the overlay thread.
 
     Args:
-        shared_state: SharedState instance (Manager-backed).
+        shared_state: SharedState instance (thread-safe).
         config_path: absolute path to config.json.
     """
     root = _project_root()
@@ -32,7 +35,7 @@ def run_overlay_process(shared_state, config_path):
 
     from backend.overlay.renderer import OverlayRenderer
 
-    print("[OVERLAY] Subprocess started (PID {})".format(
+    print("[OVERLAY] Thread started (PID {})".format(
         os.getpid()
     ))
 
@@ -42,7 +45,8 @@ def run_overlay_process(shared_state, config_path):
         renderer.start()
 
         last_boxes = []
-        last_detection_time = 0
+        last_detection_time = 0.0
+        current_hold = 2.0
 
         while shared_state.is_alive():
             try:
@@ -55,7 +59,10 @@ def run_overlay_process(shared_state, config_path):
                           ))
                     last_boxes = boxes
                     last_detection_time = now
-                elif now - last_detection_time < 0.8:
+                    current_hold = (
+                        4.0 if len(boxes) >= 2 else 2.0
+                    )
+                elif now - last_detection_time < current_hold:
                     boxes = last_boxes  # hold last result
                 else:
                     last_boxes = []
@@ -70,13 +77,13 @@ def run_overlay_process(shared_state, config_path):
 
     except Exception:
         traceback.print_exc()
-        print("[OVERLAY] Fatal error in overlay process.")
+        print("[OVERLAY] Fatal error in overlay thread.")
     finally:
         if renderer is not None:
             try:
                 renderer.stop()
             except Exception:
                 pass
-        print("[OVERLAY] Subprocess exiting (PID {})".format(
+        print("[OVERLAY] Thread exiting (PID {})".format(
             os.getpid()
         ))

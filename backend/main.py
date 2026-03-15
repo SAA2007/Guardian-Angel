@@ -1,7 +1,7 @@
 """Guardian Angel -- Backend Entry Point
 
-Starts the ProcessSupervisor (detection + overlay + audio)
-and launches the FastAPI server on localhost:8421.
+Starts the ProcessSupervisor (detection + overlay + audio
+as threads) and launches the FastAPI server on localhost:8421.
 
 Usage:
     python backend/main.py
@@ -68,7 +68,7 @@ def main():
     stats_dir = os.path.join(_project_root, "data", "stats")
     stats_manager = StatsManager(stats_dir)
 
-    # ── Start supervisor (spawns 3 subprocesses) ────────────
+    # ── Start supervisor (spawns 3 threads) ─────────────────
     supervisor = ProcessSupervisor(config_path=config_path)
     supervisor.start()
 
@@ -84,20 +84,15 @@ def main():
 
     # ── Run uvicorn ─────────────────────────────────────────
     import uvicorn
-    port = cfg.get("ui", {}).get("browser_port", 8422)
-    api_port = 8421  # API runs one port below frontend
+    api_port = 8421
 
-    # ── Write PID file ──────────────────────────────────────
-    pid_file = os.path.join(_project_root, "data", "guardian_angel.pid")
+    # ── Write PID file (single process now) ─────────────────
+    pid_file = os.path.join(
+        _project_root, "data", "guardian_angel.pid"
+    )
     os.makedirs(os.path.dirname(pid_file), exist_ok=True)
-    pid_data = {
-        "main": os.getpid(),
-        "detection": supervisor._processes["detection"].pid,
-        "overlay": supervisor._processes["overlay"].pid,
-        "audio": supervisor._processes["audio"].pid,
-    }
     with open(pid_file, "w") as f:
-        json.dump(pid_data, f)
+        f.write(str(os.getpid()))
 
     try:
         print("\n[API] Starting on http://localhost:{}".format(
