@@ -13,12 +13,22 @@
     "detection_scale": 0.5,
     "detection_skip_frames": 2,
     "detection_box_padding": 0.4,
-    "detection_ignore_classes": [
-      "BELLY_EXPOSED",
-      "FACE_FEMALE",
-      "FACE_MALE",
-      "ARMPITS_EXPOSED"
-    ],
+    "detection_classes": {
+      "FEMALE_BREAST_EXPOSED": true,
+      "FEMALE_BREAST_COVERED": false,
+      "FEMALE_GENITALIA_EXPOSED": true,
+      "FEMALE_GENITALIA_COVERED": false,
+      "MALE_GENITALIA_EXPOSED": true,
+      "BUTTOCKS_EXPOSED": true,
+      "BUTTOCKS_COVERED": false,
+      "FACE_FEMALE": false,
+      "FACE_MALE": false,
+      "BELLY_EXPOSED": false,
+      "BELLY_COVERED": false,
+      "ARMPITS_EXPOSED": false,
+      "ARMPITS_COVERED": false,
+      "FEET_EXPOSED": false
+    },
     "onnx_threads": 2
   },
   "censor": {

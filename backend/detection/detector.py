@@ -37,8 +37,8 @@ class NSFWDetector:
         self._box_padding = detection_cfg.get(
             "detection_box_padding", 0.4
         )
-        self._ignore_classes = detection_cfg.get(
-            "detection_ignore_classes", []
+        self._detection_classes = detection_cfg.get(
+            "detection_classes", {}
         )
         self._detector = None
         self.model_loaded = False
@@ -137,13 +137,13 @@ class NSFWDetector:
 
             results = []
             for det in raw_results:
-                confidence = det.get("score", 0.0)
-                if confidence < self._sensitivity:
+                # Filter by detection_classes first (before sensitivity)
+                label = det.get("class", "UNKNOWN")
+                if not self._detection_classes.get(label, False):
                     continue
 
-                # Filter ignored classes
-                label = det.get("class", "UNKNOWN")
-                if label in self._ignore_classes:
+                confidence = det.get("score", 0.0)
+                if confidence < self._sensitivity:
                     continue
 
                 # NudeNet v3 box format: [x, y, width, height]

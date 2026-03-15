@@ -32,6 +32,7 @@ class ConfigResponse(BaseModel):
     onnx_threads: int = 2
     audio_action: str = "silence"
     dev_mode: bool = False
+    detection_classes: Optional[dict] = None
 
 
 class ConfigUpdateRequest(BaseModel):
@@ -46,6 +47,7 @@ class ConfigUpdateRequest(BaseModel):
     onnx_threads: Optional[int] = None
     audio_action: Optional[str] = None
     dev_mode: Optional[bool] = None
+    detection_classes: Optional[dict] = None
 
 
 class OverlayStatusResponse(BaseModel):

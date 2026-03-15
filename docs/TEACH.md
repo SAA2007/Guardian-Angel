@@ -161,3 +161,11 @@
 [2026-03-16 00:50:27] TEACH: Runs kill_ports.py before launch in both normal and dev modes.
 [2026-03-16 00:50:28] TEACH: Restart_process updates PID file with new subprocess PID.
 [2026-03-16 00:50:28] TEACH: Created nuclear emergency stop script.
+[2026-03-16 01:06:28] TEACH: Atomic slice assignment replacing non-atomic del+extend.
+[2026-03-16 01:06:28] TEACH: IPC-WRITE and IPC-READBACK debug logging, detection_classes live reload.
+[2026-03-16 01:06:28] TEACH: OVERLAY-READ debug logging on non-empty boxes.
+[2026-03-16 01:06:28] TEACH: Replaced detection_ignore_classes with detection_classes dict.
+[2026-03-16 01:06:29] TEACH: Class filter uses detection_classes dict before sensitivity.
+[2026-03-16 01:06:29] TEACH: Added detection_classes field to ConfigResponse and ConfigUpdateRequest.
+[2026-03-16 01:06:29] TEACH: New toggle panel for per-class detection control.
+[2026-03-16 01:06:29] TEACH: Added DetectionClassesPanel below ConfigPanel.

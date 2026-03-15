@@ -89,9 +89,9 @@ def run_detection_process(shared_state, config_path):
                         "detection_box_padding",
                         pipeline.detector._box_padding,
                     )
-                    pipeline.detector._ignore_classes = det_cfg.get(
-                        "detection_ignore_classes",
-                        pipeline.detector._ignore_classes,
+                    pipeline.detector._detection_classes = det_cfg.get(
+                        "detection_classes",
+                        pipeline.detector._detection_classes,
                     )
                     pipeline.skip_frames = det_cfg.get(
                         "detection_skip_frames",
@@ -109,7 +109,17 @@ def run_detection_process(shared_state, config_path):
                 results = pipeline.run_once()
 
                 # Write results to shared state
+                if results:
+                    print("[IPC-WRITE] writing {} boxes".format(
+                        len(results)
+                    ))
                 shared_state.update_boxes(results)
+                if results:
+                    readback = shared_state.get_boxes()
+                    print("[IPC-READBACK] confirmed {} boxes"
+                          " in shared state".format(
+                              len(readback)
+                          ))
 
                 # Update metrics
                 try:

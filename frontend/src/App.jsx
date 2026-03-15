@@ -10,6 +10,7 @@ import AngelBadge from './components/AngelBadge';
 import StatusBar from './components/StatusBar';
 import StatsPanel from './components/StatsPanel';
 import ConfigPanel from './components/ConfigPanel';
+import DetectionClassesPanel from './components/DetectionClassesPanel';
 import PersistencePanel from './components/PersistencePanel';
 
 export default function App() {
@@ -74,6 +75,7 @@ export default function App() {
           <StatsPanel stats={stats} />
           <ConfigPanel config={config} onUpdate={handleConfigUpdate} />
         </div>
+        <DetectionClassesPanel config={config} onUpdate={setConfig} />
       </main>
 
       {/* Footer */}

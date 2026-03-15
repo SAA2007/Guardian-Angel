@@ -161,3 +161,11 @@
 [2026-03-16 00:50:27] PHASE:7-FIX | FILE:scripts/start.bat | ACTION:Runs kill_ports.py before launch in both normal and dev modes | STATUS:done
 [2026-03-16 00:50:28] PHASE:7-FIX | FILE:backend/ipc/supervisor.py | ACTION:restart_process updates PID file with new subprocess PID | STATUS:done
 [2026-03-16 00:50:28] PHASE:7-FIX | FILE:scripts/emergency_stop.bat | ACTION:Created nuclear emergency stop script | STATUS:done
+[2026-03-16 01:06:28] PHASE:7-FIX | FILE:backend/ipc/shared_state.py | ACTION:Atomic slice assignment replacing non-atomic del+extend | STATUS:done
+[2026-03-16 01:06:28] PHASE:7-FIX | FILE:backend/ipc/process_detection.py | ACTION:IPC-WRITE and IPC-READBACK debug logging, detection_classes live reload | STATUS:done
+[2026-03-16 01:06:28] PHASE:7-FIX | FILE:backend/ipc/process_overlay.py | ACTION:OVERLAY-READ debug logging on non-empty boxes | STATUS:done
+[2026-03-16 01:06:28] PHASE:7-FIX | FILE:config.json | ACTION:Replaced detection_ignore_classes with detection_classes dict | STATUS:done
+[2026-03-16 01:06:29] PHASE:7-FIX | FILE:backend/detection/detector.py | ACTION:Class filter uses detection_classes dict before sensitivity | STATUS:done
+[2026-03-16 01:06:29] PHASE:7-FIX | FILE:backend/api/models.py | ACTION:Added detection_classes field to ConfigResponse and ConfigUpdateRequest | STATUS:done
+[2026-03-16 01:06:29] PHASE:7-FIX | FILE:frontend/src/components/DetectionClassesPanel.jsx | ACTION:New toggle panel for per-class detection control | STATUS:done
+[2026-03-16 01:06:29] PHASE:7-FIX | FILE:frontend/src/App.jsx | ACTION:Added DetectionClassesPanel below ConfigPanel | STATUS:done

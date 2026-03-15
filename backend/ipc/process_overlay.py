@@ -49,6 +49,10 @@ def run_overlay_process(shared_state, config_path):
                 boxes = shared_state.get_boxes()
                 now = time.time()
                 if boxes:
+                    print("[OVERLAY-READ] got {} boxes,"
+                          " updating renderer".format(
+                              len(boxes)
+                          ))
                     last_boxes = boxes
                     last_detection_time = now
                 elif now - last_detection_time < 0.8:

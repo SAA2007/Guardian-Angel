@@ -47,18 +47,20 @@ class SharedState:
     # ── Box operations ──────────────────────────────────────────
 
     def update_boxes(self, new_boxes):
-        """Replace current boxes.
+        """Replace current boxes atomically.
 
-        Manager list del+extend is already process-safe
-        without a separate lock.
+        Uses slice assignment which is a single Manager RPC
+        call — safe for concurrent reads from other processes.
 
         Args:
             new_boxes: list of box dicts, each containing
                 x, y, width, height, monitor_id, tier,
                 confidence, label.
         """
-        del self._boxes[:]
-        self._boxes.extend(new_boxes)
+        try:
+            self._boxes[:] = new_boxes
+        except Exception as e:
+            print("[SHARED-STATE] update_boxes error: {}".format(e))
 
     def get_boxes(self):
         """Return a copy of current bounding boxes.
