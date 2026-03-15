@@ -3,8 +3,8 @@
   "dev_mode": true,
   "first_run": true,
   "detection": {
-    "sensitivity": 0.1,
-    "fps_max": 15,
+    "sensitivity": 0.05,
+    "fps_max": 10,
     "fps_min": 1,
     "fps_current": 30,
     "fps_auto_drop": true,
@@ -22,7 +22,7 @@
     "onnx_threads": 2
   },
   "censor": {
-    "style": "pixelate",
+    "style": "guardian_angel",
     "available_styles": [
       "guardian_angel",
       "solid_black",

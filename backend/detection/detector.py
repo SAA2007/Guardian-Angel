@@ -129,7 +129,7 @@ class NSFWDetector:
 
             # Debug: show all raw NudeNet results before filtering
             if self.dev_mode:
-                print("[DETECT-RAW] {}".format(raw_results))
+                print("[NUDENET-RAW] {}".format(raw_results))
 
             results = []
             for det in raw_results:
@@ -157,6 +157,17 @@ class NSFWDetector:
                     "_raw": [int(raw_x), int(raw_y),
                              int(raw_w), int(raw_h)],
                 })
+
+            # B3: filtered results logging
+            if self.dev_mode:
+                print(
+                    "[NUDENET-FILTERED] "
+                    "sensitivity={} kept={} of {}".format(
+                        self._sensitivity,
+                        len(results),
+                        len(raw_results),
+                    )
+                )
 
             # Step 1: Scale coordinates back to original resolution
             if self._detection_scale < 1.0:

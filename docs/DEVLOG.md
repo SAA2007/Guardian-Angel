@@ -147,3 +147,11 @@
 [2026-03-15 23:46:04] PHASE:7-FIX | FILE:backend/overlay/renderer.py | ACTION:Tier-based rendering - MICRO solid gold, SMALL nur orb, letterbox aspect ratio | STATUS:done
 [2026-03-15 23:46:05] PHASE:7-FIX | FILE:config.json | ACTION:Added detection_box_padding 0.4 and detection_ignore_classes | STATUS:done
 [2026-03-15 23:46:05] PHASE:7-FIX | FILE:frontend/src/components/ConfigPanel.jsx | ACTION:Added box padding slider 0.0-1.0 | STATUS:done
+[2026-03-16 00:11:34] PHASE:0 | FILE:docs/PHASES.md | ACTION:Updated with current status markers, fixes applied per phase, v1.0 and v1.1 planned improvements | STATUS:done
+[2026-03-16 00:19:48] PHASE:7-FIX | FILE:backend/ipc/process_detection.py | ACTION:Live config reload every iteration, startup health check, heartbeat every 50 frames | STATUS:done
+[2026-03-16 00:19:48] PHASE:7-FIX | FILE:backend/ipc/supervisor.py | ACTION:Added restart_process() method for named subprocess restart | STATUS:done
+[2026-03-16 00:19:49] PHASE:7-FIX | FILE:backend/api/routes.py | ACTION:Added POST /restart-detection endpoint | STATUS:done
+[2026-03-16 00:19:49] PHASE:7-FIX | FILE:frontend/src/api.js | ACTION:Added restartDetection() API function | STATUS:done
+[2026-03-16 00:19:49] PHASE:7-FIX | FILE:frontend/src/components/ConfigPanel.jsx | ACTION:CPU threads max=16, restart detection button | STATUS:done
+[2026-03-16 00:19:49] PHASE:7-FIX | FILE:backend/detection/detector.py | ACTION:NUDENET-RAW and NUDENET-FILTERED logging in dev_mode | STATUS:done
+[2026-03-16 00:19:49] PHASE:7-FIX | FILE:config.json | ACTION:Sensitivity lowered to 0.05 for debugging | STATUS:done

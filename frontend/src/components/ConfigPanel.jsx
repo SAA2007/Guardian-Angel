@@ -4,6 +4,9 @@
  * Sends PATCH /config on every change.
  */
 
+import { useState } from 'react';
+import { restartDetection } from '../api';
+
 const CENSOR_OPTIONS = [
   { value: 'guardian_angel', label: 'Guardian Angel' },
   { value: 'solid_black', label: 'Solid Black' },
@@ -50,10 +53,18 @@ const labelStyle = {
 };
 
 export default function ConfigPanel({ config, onUpdate }) {
+  const [restarting, setRestarting] = useState(false);
+
   if (!config) return null;
 
   function handleChange(field, value) {
     onUpdate({ [field]: value });
+  }
+
+  async function handleRestart() {
+    setRestarting(true);
+    await restartDetection();
+    setTimeout(() => setRestarting(false), 2000);
   }
 
   return (
@@ -177,18 +188,41 @@ export default function ConfigPanel({ config, onUpdate }) {
         <div>
           <label style={labelStyle}>CPU Threads</label>
           <p className="text-xs text-gray-500 mb-2 mt-[-2px]">
-            Threads Guardian Angel may use. Lower = less CPU impact on other apps
+            i7-8700 has 12 threads. Higher = faster detection but more CPU usage. Changes require restart.
           </p>
           <input
             type="number"
             min="1"
-            max="8"
+            max="16"
+            step="1"
             value={config.onnx_threads || 2}
             onChange={(e) =>
               handleChange('onnx_threads', parseInt(e.target.value, 10))
             }
             style={{ ...selectStyle, width: '80px' }}
           />
+        </div>
+
+        {/* Restart Detection */}
+        <div>
+          <button
+            onClick={handleRestart}
+            disabled={restarting}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: restarting ? '#666' : '#C9A84C',
+              fontSize: '0.85rem',
+              cursor: restarting ? 'default' : 'pointer',
+              padding: '4px 0',
+              textDecoration: 'underline',
+            }}
+          >
+            {restarting ? 'Restarting...' : '↺ Apply & Restart Detection'}
+          </button>
+          <p className="text-xs text-gray-500 mt-1">
+            Restart detection subprocess to apply thread count and scale changes
+          </p>
         </div>
 
         {/* FPS max */}

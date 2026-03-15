@@ -84,3 +84,7 @@ export async function postQuit() {
 export async function getRecentEvents() {
   return safeFetch(`${BASE}/stats/recent`);
 }
+
+export async function restartDetection() {
+  return safeFetch(`${BASE}/restart-detection`, { method: 'POST' });
+}

@@ -147,3 +147,11 @@
 [2026-03-15 23:46:04] TEACH: Tier-based rendering - MICRO solid gold, SMALL nur orb, letterbox aspect ratio.
 [2026-03-15 23:46:05] TEACH: Added detection_box_padding 0.4 and detection_ignore_classes.
 [2026-03-15 23:46:05] TEACH: Added box padding slider 0.0-1.0.
+[2026-03-16 00:11:34] TEACH: Updated with current status markers, fixes applied per phase, v1.0 and v1.1 planned improvements.
+[2026-03-16 00:19:48] TEACH: Live config reload every iteration, startup health check, heartbeat every 50 frames.
+[2026-03-16 00:19:48] TEACH: Added restart_process() method for named subprocess restart.
+[2026-03-16 00:19:49] TEACH: Added POST /restart-detection endpoint.
+[2026-03-16 00:19:49] TEACH: Added restartDetection() API function.
+[2026-03-16 00:19:49] TEACH: CPU threads max=16, restart detection button.
+[2026-03-16 00:19:49] TEACH: NUDENET-RAW and NUDENET-FILTERED logging in dev_mode.
+[2026-03-16 00:19:49] TEACH: Sensitivity lowered to 0.05 for debugging.

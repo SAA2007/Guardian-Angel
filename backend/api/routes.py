@@ -302,6 +302,23 @@ def get_telemetry(request: Request):
         return _error_response(e)
 
 
+# ── POST /restart-detection ─────────────────────────────────────
+
+@router.post("/restart-detection")
+def restart_detection(request: Request):
+    """Restart the detection subprocess."""
+    try:
+        supervisor, _, _, _ = _get_deps(request)
+        ok = supervisor.restart_process("detection")
+        if ok:
+            return {"ok": True, "message": "Detection subprocess restarted"}
+        else:
+            return _error_response("Failed to restart detection", 500)
+    except Exception as e:
+        traceback.print_exc()
+        return _error_response(e)
+
+
 # ── Persistence & Watchdog ──────────────────────────────────────
 
 @router.get("/persistence/status")

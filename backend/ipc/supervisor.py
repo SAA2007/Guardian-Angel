@@ -243,6 +243,52 @@ class ProcessSupervisor:
 
         return status
 
+    def restart_process(self, name):
+        """Restart a single subprocess by name.
+
+        Terminates the process, waits up to 3 seconds,
+        force-kills if needed, then spawns a fresh one.
+
+        Args:
+            name: process name (detection/overlay/audio).
+
+        Returns:
+            bool: True if restarted successfully.
+        """
+        targets = {
+            "detection": run_detection_process,
+            "overlay": run_overlay_process,
+            "audio": run_audio_process,
+        }
+        if name not in targets:
+            print("[SUPERVISOR] Unknown process: {}".format(name))
+            return False
+
+        proc = self._processes.get(name)
+        if proc is not None and proc.is_alive():
+            print("[SUPERVISOR] Terminating {}...".format(name))
+            proc.terminate()
+            proc.join(timeout=3.0)
+            if proc.is_alive():
+                print("[SUPERVISOR] Force-killing {}...".format(
+                    name
+                ))
+                proc.kill()
+                proc.join(timeout=2.0)
+
+        try:
+            self._processes[name] = self._spawn_process(
+                name, targets[name]
+            )
+            print("[SUPERVISOR] {} restarted.".format(name))
+            return True
+        except Exception:
+            traceback.print_exc()
+            print("[SUPERVISOR] Failed to restart {}.".format(
+                name
+            ))
+            return False
+
     @property
     def shared_state(self):
         """Direct access to SharedState (for advanced use)."""
