@@ -71,3 +71,13 @@
 [2026-03-15 19:44:53] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 60 to 55 | STATUS:done
 [2026-03-15 19:49:18] PHASE:4 | FILE:README.md | ACTION:Full rewrite - overview, mission, architecture diagram, phase status table, requirements, install, Islamic note, license, contributing | STATUS:done
 [2026-03-15 19:49:18] PHASE:4 | FILE:.github/* | ACTION:Created bug_report.md, feature_request.md issue templates and repo_meta.txt with description/topics | STATUS:done
+[2026-03-15 20:00:04] PHASE:3 | FILE:vad.py | ACTION:Added trust_repo=True to torch.hub.load to suppress UserWarning on first run | STATUS:done
+[2026-03-15 20:07:06] PHASE:5 | FILE:models.py | ACTION:Created Pydantic models - StatusResponse, ConfigResponse, ConfigUpdateRequest, OverlayStatusResponse, AudioStatusResponse, StatsResponse, TelemetryPayload, TriggerRequest | STATUS:done
+[2026-03-15 20:07:06] PHASE:5 | FILE:config_manager.py | ACTION:Created ConfigManager - thread-safe config read/write, deep merge, dot-key access, dev config overlay, atomic write via temp+rename | STATUS:done
+[2026-03-15 20:07:06] PHASE:5 | FILE:stats_manager.py | ACTION:Created StatsManager - session+cumulative JSON files, trigger recording, streak tracking, combined view for API | STATUS:done
+[2026-03-15 20:07:53] PHASE:5 | FILE:routes.py | ACTION:Created all API route handlers - GET /status, GET/PATCH /config, GET /overlay, GET /audio, GET /stats, POST /stats/trigger, GET /telemetry, POST /quit. Error wrapping on all endpoints | STATUS:done
+[2026-03-15 20:07:53] PHASE:5 | FILE:server.py | ACTION:Created FastAPI app factory - CORS for localhost:8422, app.state dependency wiring, startup/shutdown lifecycle hooks | STATUS:done
+[2026-03-15 20:08:15] PHASE:5 | FILE:main.py | ACTION:Updated backend entry point - instantiates ConfigManager, StatsManager, ProcessSupervisor, creates FastAPI app, runs uvicorn on localhost:8421 | STATUS:done
+[2026-03-15 20:08:16] PHASE:5 | FILE:test_api.py | ACTION:Created API integration test - starts supervisor+FastAPI in background thread, hits 5 GET endpoints, prints results | STATUS:done
+[2026-03-15 20:08:16] PHASE:5 | FILE:__init__.py | ACTION:Created with clean exports for create_app, ConfigManager, StatsManager | STATUS:done
+[2026-03-15 20:13:04] PHASE:5 | FILE:README.md | ACTION:Updated phase table - Phase 5 done, Phase 6 in progress | STATUS:done

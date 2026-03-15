@@ -71,3 +71,13 @@
 [2026-03-15 19:44:53] TEACH: Auto-dropped FPS from 60 to 55.
 [2026-03-15 19:49:18] TEACH: Full rewrite - overview, mission, architecture diagram, phase status table, requirements, install, Islamic note, license, contributing.
 [2026-03-15 19:49:18] TEACH: Created bug_report.md, feature_request.md issue templates and repo_meta.txt with description/topics.
+[2026-03-15 20:00:04] TEACH: Added trust_repo=True to torch.hub.load to suppress UserWarning on first run.
+[2026-03-15 20:07:06] TEACH: Created Pydantic models - StatusResponse, ConfigResponse, ConfigUpdateRequest, OverlayStatusResponse, AudioStatusResponse, StatsResponse, TelemetryPayload, TriggerRequest.
+[2026-03-15 20:07:06] TEACH: Created ConfigManager - thread-safe config read/write, deep merge, dot-key access, dev config overlay, atomic write via temp+rename.
+[2026-03-15 20:07:06] TEACH: Created StatsManager - session+cumulative JSON files, trigger recording, streak tracking, combined view for API.
+[2026-03-15 20:07:53] TEACH: Created all API route handlers - GET /status, GET/PATCH /config, GET /overlay, GET /audio, GET /stats, POST /stats/trigger, GET /telemetry, POST /quit. Error wrapping on all endpoints.
+[2026-03-15 20:07:53] TEACH: Created FastAPI app factory - CORS for localhost:8422, app.state dependency wiring, startup/shutdown lifecycle hooks.
+[2026-03-15 20:08:15] TEACH: Updated backend entry point - instantiates ConfigManager, StatsManager, ProcessSupervisor, creates FastAPI app, runs uvicorn on localhost:8421.
+[2026-03-15 20:08:16] TEACH: Created API integration test - starts supervisor+FastAPI in background thread, hits 5 GET endpoints, prints results.
+[2026-03-15 20:08:16] TEACH: Created with clean exports for create_app, ConfigManager, StatsManager.
+[2026-03-15 20:13:04] TEACH: Updated phase table - Phase 5 done, Phase 6 in progress.
