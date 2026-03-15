@@ -3,8 +3,8 @@
   "dev_mode": true,
   "first_run": true,
   "detection": {
-    "sensitivity": 0.5,
-    "fps_max": 5,
+    "sensitivity": 0.4,
+    "fps_max": 10,
     "fps_min": 1,
     "fps_current": 30,
     "fps_auto_drop": true,
@@ -15,7 +15,7 @@
     "onnx_threads": 2
   },
   "censor": {
-    "style": "blur_heavy",
+    "style": "guardian_angel",
     "available_styles": [
       "guardian_angel",
       "solid_black",
@@ -37,7 +37,7 @@
     "vad_enabled": true,
     "whisper_model": "tiny.en",
     "yamnet_enabled": true,
-    "mute_style": "silence",
+    "mute_style": "bleep",
     "bleep_frequency_hz": 1000
   },
   "overlay": {
@@ -133,5 +133,9 @@
     "save_flagged_frames": false,
     "flagged_frames_dir": "data/debug_frames/",
     "api_key_override": null
+  },
+  "persistence": {
+    "mode": false,
+    "watchdog_enabled": false
   }
 }

@@ -242,6 +242,19 @@ def get_stats(request: Request):
         return _error_response(e)
 
 
+# ── GET /stats/recent ──────────────────────────────────────────
+
+@router.get("/stats/recent")
+def get_recent_events(request: Request):
+    """Return the last 5 trigger events."""
+    try:
+        _, _, stats_mgr, _ = _get_deps(request)
+        return stats_mgr.get_recent_events(5)
+    except Exception as e:
+        traceback.print_exc()
+        return _error_response(e)
+
+
 # ── POST /stats/trigger ────────────────────────────────────────
 
 @router.post("/stats/trigger")

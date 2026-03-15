@@ -4,6 +4,9 @@
  * Islamic-themed dark card with gold accents.
  */
 
+import { useState, useEffect } from 'react';
+import { getRecentEvents } from '../api';
+
 function formatUptime(seconds) {
   const s = Math.floor(seconds || 0);
   const h = Math.floor(s / 3600);
@@ -12,7 +15,26 @@ function formatUptime(seconds) {
   return [h, m, sec].map((v) => String(v).padStart(2, '0')).join(':');
 }
 
+function formatTime(iso) {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  } catch {
+    return iso;
+  }
+}
+
 export default function StatsPanel({ stats }) {
+  const [events, setEvents] = useState(null);
+
+  useEffect(() => {
+    getRecentEvents().then(setEvents);
+    const id = setInterval(() => {
+      getRecentEvents().then(setEvents);
+    }, 5000);
+    return () => clearInterval(id);
+  }, []);
+
   if (!stats) return null;
 
   return (
@@ -95,6 +117,31 @@ export default function StatsPanel({ stats }) {
             uptime
           </div>
         </div>
+      </div>
+
+      {/* Live Activity Feed */}
+      <div className="mt-6 pt-4" style={{ borderTop: '1px solid #2A2010' }}>
+        <h3 className="text-sm font-semibold mb-3" style={{ color: '#C9A84C' }}>
+          📡 Live Activity
+        </h3>
+        {events && events.length > 0 ? (
+          <div className="space-y-2">
+            {events.map((evt, i) => (
+              <div key={i} className="flex items-center gap-2 text-xs">
+                <span className="font-mono" style={{ color: '#A89B80' }}>
+                  [{formatTime(evt.timestamp)}]
+                </span>
+                <span style={{ color: '#F5F0E6' }}>
+                  {evt.type === 'video' ? '🎬 Video' : '🔊 Audio'} trigger detected
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs" style={{ color: '#A89B80' }}>
+            No triggers detected yet. Stay strong. 💪
+          </p>
+        )}
       </div>
     </div>
   );

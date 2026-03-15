@@ -80,3 +80,7 @@ export async function getWatchdogHealth() {
 export async function postQuit() {
   return safeFetch(`${BASE}/quit`, { method: 'POST' });
 }
+
+export async function getRecentEvents() {
+  return safeFetch(`${BASE}/stats/recent`);
+}

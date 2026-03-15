@@ -87,6 +87,12 @@ def main():
     port = cfg.get("ui", {}).get("browser_port", 8422)
     api_port = 8421  # API runs one port below frontend
 
+    # ── Write PID file ──────────────────────────────────────
+    pid_file = os.path.join(_project_root, "data", "guardian_angel.pid")
+    os.makedirs(os.path.dirname(pid_file), exist_ok=True)
+    with open(pid_file, "w") as f:
+        f.write(str(os.getpid()))
+
     try:
         print("\n[API] Starting on http://localhost:{}".format(
             api_port
@@ -103,6 +109,8 @@ def main():
         traceback.print_exc()
     finally:
         supervisor.stop()
+        if os.path.exists(pid_file):
+            os.remove(pid_file)
         print("[MAIN] Guardian Angel stopped.")
 
 

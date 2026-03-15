@@ -131,3 +131,11 @@
 [2026-03-15 22:46:49] TEACH: Deleted stale session.json and cumulative.json, verified StatsManager returns all zeros.
 [2026-03-15 22:54:37] TEACH: Rewrote kill_port to use psutil.net_connections instead of process_iter.
 [2026-03-15 22:55:06] TEACH: Extracted inline Python into kill_ports.py, simplified stop.bat.
+[2026-03-15 23:22:42] TEACH: Added PID file write on startup, delete on shutdown.
+[2026-03-15 23:22:42] TEACH: Added PID-based kill as primary stop method.
+[2026-03-15 23:22:42] TEACH: Added dev_mode raw detection debug print before sensitivity filter.
+[2026-03-15 23:22:42] TEACH: Lowered sensitivity to 0.4, dev_mode already true.
+[2026-03-15 23:22:42] TEACH: Renamed to Your Guardian, fixed all 4 disable flow screens, added error handling.
+[2026-03-15 23:22:42] TEACH: Added subtle shutdown button in footer.
+[2026-03-15 23:22:43] TEACH: Added Live Activity feed showing last 5 trigger events.
+[2026-03-15 23:22:43] TEACH: Added record_event, get_recent_events, GET /stats/recent endpoint.

@@ -131,3 +131,11 @@
 [2026-03-15 22:46:49] PHASE:7-FIX | FILE:data/stats/*.json | ACTION:Deleted stale session.json and cumulative.json, verified StatsManager returns all zeros | STATUS:done
 [2026-03-15 22:54:37] PHASE:7-FIX | FILE:backend/main.py | ACTION:Rewrote kill_port to use psutil.net_connections instead of process_iter | STATUS:done
 [2026-03-15 22:55:06] PHASE:7-FIX | FILE:scripts/kill_ports.py, scripts/stop.bat | ACTION:Extracted inline Python into kill_ports.py, simplified stop.bat | STATUS:done
+[2026-03-15 23:22:42] PHASE:7-FIX | FILE:backend/main.py | ACTION:Added PID file write on startup, delete on shutdown | STATUS:done
+[2026-03-15 23:22:42] PHASE:7-FIX | FILE:scripts/kill_ports.py | ACTION:Added PID-based kill as primary stop method | STATUS:done
+[2026-03-15 23:22:42] PHASE:7-FIX | FILE:backend/detection/detector.py | ACTION:Added dev_mode raw detection debug print before sensitivity filter | STATUS:done
+[2026-03-15 23:22:42] PHASE:7-FIX | FILE:config.json | ACTION:Lowered sensitivity to 0.4, dev_mode already true | STATUS:done
+[2026-03-15 23:22:42] PHASE:7-FIX | FILE:frontend/src/components/PersistencePanel.jsx | ACTION:Renamed to Your Guardian, fixed all 4 disable flow screens, added error handling | STATUS:done
+[2026-03-15 23:22:42] PHASE:7-FIX | FILE:frontend/src/App.jsx | ACTION:Added subtle shutdown button in footer | STATUS:done
+[2026-03-15 23:22:43] PHASE:7-FIX | FILE:frontend/src/components/StatsPanel.jsx | ACTION:Added Live Activity feed showing last 5 trigger events | STATUS:done
+[2026-03-15 23:22:43] PHASE:7-FIX | FILE:backend/api/stats_manager.py, routes.py, api.js | ACTION:Added record_event, get_recent_events, GET /stats/recent endpoint | STATUS:done

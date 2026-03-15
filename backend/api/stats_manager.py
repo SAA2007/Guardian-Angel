@@ -202,3 +202,53 @@ class StatsManager:
                 ),
                 "uptime_seconds": uptime,
             }
+
+    def record_event(self, trigger_type):
+        """Append a trigger event to events.json.
+
+        Args:
+            trigger_type: "video" or "audio".
+        """
+        from datetime import datetime, timezone
+
+        events_path = os.path.join(self._stats_dir, "events.json")
+        with self._lock:
+            events = []
+            if os.path.exists(events_path):
+                try:
+                    with open(events_path, "r", encoding="utf-8") as f:
+                        events = json.load(f)
+                except (json.JSONDecodeError, OSError):
+                    events = []
+
+            events.append({
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "type": trigger_type,
+            })
+
+            # Keep max 100 events, trim oldest
+            if len(events) > 100:
+                events = events[-100:]
+
+            self._save(events_path, events)
+
+    def get_recent_events(self, n=5):
+        """Return the last n trigger events.
+
+        Args:
+            n: number of events to return.
+
+        Returns:
+            list: last n events.
+        """
+        events_path = os.path.join(self._stats_dir, "events.json")
+        with self._lock:
+            if not os.path.exists(events_path):
+                return []
+            try:
+                with open(events_path, "r", encoding="utf-8") as f:
+                    events = json.load(f)
+                return events[-n:]
+            except (json.JSONDecodeError, OSError):
+                return []
+

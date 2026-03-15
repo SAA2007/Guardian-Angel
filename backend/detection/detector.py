@@ -36,6 +36,7 @@ class NSFWDetector:
         self._onnx_threads: int = detection_cfg.get("onnx_threads", 2)
         self._detector = None
         self.model_loaded: bool = False
+        self.dev_mode: bool = config.get("dev_mode", False)
 
         # Limit ONNX threads via environment before model load
         os.environ["OMP_NUM_THREADS"] = str(self._onnx_threads)
@@ -97,6 +98,10 @@ class NSFWDetector:
             )
             cv2.imwrite(tmp_path, frame_input)
             raw_results = self._detector.detect(tmp_path)
+
+            # Debug: show all raw NudeNet results before filtering
+            if self.dev_mode:
+                print("[DETECT-RAW] {}".format(raw_results))
 
             results: list[dict] = []
             for det in raw_results:

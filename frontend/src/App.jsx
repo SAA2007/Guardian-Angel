@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { getStatus, getConfig, updateConfig, getStats } from './api';
+import { getStatus, getConfig, updateConfig, getStats, postQuit } from './api';
 import AngelBadge from './components/AngelBadge';
 import StatusBar from './components/StatusBar';
 import StatsPanel from './components/StatsPanel';
@@ -16,6 +16,7 @@ export default function App() {
   const [status, setStatus] = useState(null);
   const [stats, setStats] = useState(null);
   const [config, setConfig] = useState(null);
+  const [shutdownMsg, setShutdownMsg] = useState(null);
 
   // Poll /status every 2 seconds
   useEffect(() => {
@@ -46,6 +47,15 @@ export default function App() {
     if (updated) setConfig(updated);
   }
 
+  // Handle shutdown
+  async function handleShutdown() {
+    setShutdownMsg('Shutting down...');
+    await postQuit();
+    setTimeout(() => {
+      setShutdownMsg('You can close this window.');
+    }, 2000);
+  }
+
   return (
     <div
       className="min-h-screen flex flex-col"
@@ -67,10 +77,20 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="text-center py-4">
+      <footer className="flex justify-between items-center px-6 py-4">
         <p className="text-xs" style={{ color: '#8B7332' }}>
           Guardian Angel — protecting your journey
         </p>
+        {shutdownMsg ? (
+          <span className="text-xs text-red-400">{shutdownMsg}</span>
+        ) : (
+          <button
+            onClick={handleShutdown}
+            className="text-xs text-red-900/70 hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer"
+          >
+            Shut down Guardian Angel
+          </button>
+        )}
       </footer>
     </div>
   );

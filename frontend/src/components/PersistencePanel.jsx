@@ -6,6 +6,7 @@ export default function PersistencePanel() {
   const [status, setStatus] = useState(null);
   const [flowState, setFlowState] = useState(null);
   const [reason, setReason] = useState('');
+  const [error, setError] = useState(null);
 
   async function loadStatus() {
     const s = await api.getPersistenceStatus();
@@ -17,22 +18,22 @@ export default function PersistencePanel() {
     loadStatus();
   }, []);
 
-  async function loadStatus() {
-    const s = await api.getPersistenceStatus();
-    setStatus(s);
-  }
-
   // --- Disable Flow Actions ---
 
   async function handleStartDisable() {
+    setError(null);
     const res = await api.startDisableFlow();
+    if (!res) {
+      setError('Failed to start disable flow. Please try again.');
+      return;
+    }
     setFlowState(res);
   }
 
   const pollDisableState = async () => {
     if (!flowState || flowState.state !== 'WAITING') return;
     const res = await api.getDisableState();
-    setFlowState(res);
+    if (res) setFlowState(res);
   };
 
   // Poll waiting state every second to show countdown
@@ -45,10 +46,15 @@ export default function PersistencePanel() {
   }, [flowState, pollDisableState]);
 
   async function handleAdvance(payload = {}) {
+    setError(null);
     const res = await api.advanceDisableFlow(payload);
+    if (!res) {
+      setError('Request failed. Please try again.');
+      return;
+    }
     setFlowState(res);
     if (res?.state === 'DONE') {
-      loadStatus(); // refresh top-level lock status
+      loadStatus();
     }
   }
 
@@ -71,6 +77,12 @@ export default function PersistencePanel() {
         <AngelBadge />
         <h2 className="text-xl font-bold text-[#C9A84C] mt-6 mb-4">Disable Protection</h2>
 
+        {error && (
+          <div className="bg-red-900/30 text-red-400 text-sm p-3 rounded mb-4 border border-red-800/50">
+            {error}
+          </div>
+        )}
+
         {flowState.state === 'LOCKED' && (
           <div>
             <div className="text-4xl mb-4">🔒</div>
@@ -89,7 +101,7 @@ export default function PersistencePanel() {
 
         {flowState.state === 'WAITING' && (
           <div>
-            <p className="text-[#F5F0E6] text-lg mb-4 mt-8">Taking a moment to reflect...</p>
+            <p className="text-[#F5F0E6] text-lg mb-4 mt-8">Take a moment. Your future self will thank you.</p>
             <div className="text-5xl font-mono text-[#C9A84C] mb-8">
               {Math.ceil(flowState.remaining_seconds)}s
             </div>
@@ -104,7 +116,7 @@ export default function PersistencePanel() {
             </label>
             <textarea
               className="w-full h-32 bg-[#0F0A00] text-[#F5F0E6] p-3 rounded border border-[#2A2010] outline-none resize-none focus:border-[#C9A84C] transition-colors"
-              placeholder="Please be honest with yourself..."
+              placeholder="Be honest with yourself..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
@@ -117,7 +129,7 @@ export default function PersistencePanel() {
                 disabled={reason.length < 10}
                 className="px-6 py-2 bg-red-900/80 text-white rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-800 transition-colors"
               >
-                Submit
+                Continue
               </button>
             </div>
           </div>
@@ -140,25 +152,53 @@ export default function PersistencePanel() {
                 <div className="text-2xl text-[#C9A84C] font-semibold">{flowState.stats?.total_triggers} triggers</div>
               </div>
             </div>
-            <button
-              onClick={() => handleAdvance()}
-              className="px-6 py-2 bg-red-900/80 text-white rounded font-medium hover:bg-red-800 transition-colors w-full"
-            >
-              Continue Disable Process
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setFlowState(null)}
+                className="flex-1 px-4 py-2 bg-[#2A2010] text-[#C9A84C] rounded font-medium hover:bg-[#3A2D16] transition-colors border border-[#C9A84C]/30"
+              >
+                Go Back (Stay Protected)
+              </button>
+              <button
+                onClick={() => handleAdvance()}
+                className="flex-1 px-4 py-2 bg-red-900/80 text-white rounded font-medium hover:bg-red-800 transition-colors"
+              >
+                I still want to disable
+              </button>
+            </div>
           </div>
         )}
 
         {flowState.state === 'NOTIFY' && (
           <div>
-            <p className="text-[#F5F0E6] mb-8">
-              Your accountability contact will be notified of this action, including the reason you provided.
-            </p>
+            {status?.accountability_email ? (
+              <p className="text-[#F5F0E6] mb-8">
+                Your contact will be notified.
+              </p>
+            ) : (
+              <p className="text-[#A89B80] mb-8">
+                No accountability contact set. Consider adding one in settings for extra support.
+              </p>
+            )}
             <button
               onClick={() => handleAdvance()}
               className="px-6 py-2 bg-red-600 text-white font-bold rounded hover:bg-red-500 transition-colors w-full"
             >
-              Disable Guardian Angel
+              Disable Protection
+            </button>
+          </div>
+        )}
+
+        {flowState.state === 'COMPLETED' && (
+          <div>
+            <p className="text-[#F5F0E6] text-lg mb-6">
+              Protection disabled. May Allah make it easy for you.
+            </p>
+            <button
+              onClick={() => { setFlowState(null); loadStatus(); }}
+              className="px-6 py-2 bg-[#2A2010] text-[#F5F0E6] rounded hover:bg-[#3A2D16] transition-colors"
+            >
+              Return to Dashboard
             </button>
           </div>
         )}
@@ -171,7 +211,7 @@ export default function PersistencePanel() {
     <div className="rounded-xl p-6 bg-[#1A1408] border border-[#2A2010]">
       <div className="flex justify-between items-start mb-4">
         <h2 className="text-lg font-semibold text-[#C9A84C]">
-          🛡️ Lock & Watchdog
+          🛡️ Your Guardian
         </h2>
         {status.mode === 'off' ? (
           <span className="px-3 py-1 bg-green-900/30 text-green-400 text-xs font-bold rounded-full border border-green-800/50">
@@ -242,7 +282,7 @@ export default function PersistencePanel() {
         onClick={handleStartDisable}
         className="w-full py-3 bg-[#2A2010] text-red-400 font-semibold rounded hover:bg-[#3A2D16] border border-red-900/30 transition-colors"
       >
-        Disable Protection...
+        I need a break...
       </button>
     </div>
   );
