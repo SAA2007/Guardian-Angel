@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api';
+import * as api from '../api';
 import AngelBadge from './AngelBadge';
 
 export default function PersistencePanel() {
