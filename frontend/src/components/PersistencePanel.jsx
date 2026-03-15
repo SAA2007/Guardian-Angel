@@ -7,6 +7,11 @@ export default function PersistencePanel() {
   const [flowState, setFlowState] = useState(null);
   const [reason, setReason] = useState('');
 
+  async function loadStatus() {
+    const s = await api.getPersistenceStatus();
+    setStatus(s);
+  }
+
   // Fetch status on mount
   useEffect(() => {
     loadStatus();
@@ -24,11 +29,11 @@ export default function PersistencePanel() {
     setFlowState(res);
   }
 
-  async function pollDisableState() {
+  const pollDisableState = async () => {
     if (!flowState || flowState.state !== 'WAITING') return;
     const res = await api.getDisableState();
     setFlowState(res);
-  }
+  };
 
   // Poll waiting state every second to show countdown
   useEffect(() => {
@@ -37,7 +42,7 @@ export default function PersistencePanel() {
       timer = setInterval(pollDisableState, 1000);
     }
     return () => clearInterval(timer);
-  }, [flowState]);
+  }, [flowState, pollDisableState]);
 
   async function handleAdvance(payload = {}) {
     const res = await api.advanceDisableFlow(payload);
