@@ -38,7 +38,7 @@ Audio Loopback (WASAPI) → Silero VAD → Whisper Transcription → Mute / Blee
 | 4 | Multiprocessing IPC | ✅ Done |
 | 5 | FastAPI Backend | ✅ Done |
 | 6 | React Frontend | ✅ Done |
-| Phase 7 | Performance Overlay + Persistence | ⏳ Done |
+| Phase 7 | Performance Overlay + Persistence | ✅ Done |
 | Phase 8 | Testing & Packaging | 📝 Pending |
 | 9 | Packaging + Installer | ⏳ Pending |
 

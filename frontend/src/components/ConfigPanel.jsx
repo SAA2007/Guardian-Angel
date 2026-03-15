@@ -242,7 +242,7 @@ export default function ConfigPanel({ config, onUpdate }) {
             <p className="text-xs text-gray-500 ml-6">
               Shows bounding boxes, FPS counter, and confidence scores
             </p>
-        </div>>
+        </div>
       </div>
     </div>
   );
