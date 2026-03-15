@@ -7,6 +7,9 @@ echo ============================================================
 echo  Guardian Angel v0.1.0 - Starting...
 echo ============================================================
 echo.
+echo Cleaning up any existing processes...
+C:\Users\DELL\AppData\Local\Programs\Python\Python311\python.exe scripts/kill_ports.py
+echo.
 echo Starting backend on http://localhost:8421
 start "Guardian Angel - Backend" cmd /k "cd /d A:\projects\guardian-angel && C:\Users\DELL\AppData\Local\Programs\Python\Python311\python.exe backend/main.py"
 echo Waiting for backend to initialise...
@@ -25,6 +28,9 @@ pause >nul
 goto end
 
 :dev_mode
+echo [DEV MODE] Cleaning up any existing processes...
+C:\Users\DELL\AppData\Local\Programs\Python\Python311\python.exe scripts/kill_ports.py
+echo.
 echo [DEV MODE] Running backend in this window...
 echo Frontend launching in separate window...
 start "Guardian Angel - Frontend" cmd /k "cd /d A:\projects\guardian-angel\frontend && npm run dev"

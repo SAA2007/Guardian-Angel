@@ -156,3 +156,8 @@
 [2026-03-16 00:19:49] TEACH: NUDENET-RAW and NUDENET-FILTERED logging in dev_mode.
 [2026-03-16 00:19:49] TEACH: Sensitivity lowered to 0.05 for debugging.
 [2026-03-16 00:23:21] TEACH: Reduced debug log spam - NUDENET lines only on change, GA-DEV every 30 frames, DETECT-BOX only with detections.
+[2026-03-16 00:50:27] TEACH: PID file now stores JSON with main+detection+overlay+audio PIDs.
+[2026-03-16 00:50:27] TEACH: Rewritten to read JSON PID file, port fallback, cmdline scan for guardian-angel processes.
+[2026-03-16 00:50:27] TEACH: Runs kill_ports.py before launch in both normal and dev modes.
+[2026-03-16 00:50:28] TEACH: Restart_process updates PID file with new subprocess PID.
+[2026-03-16 00:50:28] TEACH: Created nuclear emergency stop script.

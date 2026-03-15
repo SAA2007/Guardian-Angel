@@ -156,3 +156,8 @@
 [2026-03-16 00:19:49] PHASE:7-FIX | FILE:backend/detection/detector.py | ACTION:NUDENET-RAW and NUDENET-FILTERED logging in dev_mode | STATUS:done
 [2026-03-16 00:19:49] PHASE:7-FIX | FILE:config.json | ACTION:Sensitivity lowered to 0.05 for debugging | STATUS:done
 [2026-03-16 00:23:21] PHASE:7-FIX | FILE:backend/detection/detector.py,backend/detection/pipeline.py | ACTION:Reduced debug log spam - NUDENET lines only on change, GA-DEV every 30 frames, DETECT-BOX only with detections | STATUS:done
+[2026-03-16 00:50:27] PHASE:7-FIX | FILE:backend/main.py | ACTION:PID file now stores JSON with main+detection+overlay+audio PIDs | STATUS:done
+[2026-03-16 00:50:27] PHASE:7-FIX | FILE:scripts/kill_ports.py | ACTION:Rewritten to read JSON PID file, port fallback, cmdline scan for guardian-angel processes | STATUS:done
+[2026-03-16 00:50:27] PHASE:7-FIX | FILE:scripts/start.bat | ACTION:Runs kill_ports.py before launch in both normal and dev modes | STATUS:done
+[2026-03-16 00:50:28] PHASE:7-FIX | FILE:backend/ipc/supervisor.py | ACTION:restart_process updates PID file with new subprocess PID | STATUS:done
+[2026-03-16 00:50:28] PHASE:7-FIX | FILE:scripts/emergency_stop.bat | ACTION:Created nuclear emergency stop script | STATUS:done

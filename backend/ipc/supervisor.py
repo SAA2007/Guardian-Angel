@@ -281,6 +281,21 @@ class ProcessSupervisor:
                 name, targets[name]
             )
             print("[SUPERVISOR] {} restarted.".format(name))
+
+            # Update PID file with new subprocess PID
+            try:
+                pid_file = os.path.join(
+                    _project_root(), "data", "guardian_angel.pid"
+                )
+                if os.path.exists(pid_file):
+                    with open(pid_file, "r") as f:
+                        pids = json.load(f)
+                    pids[name] = self._processes[name].pid
+                    with open(pid_file, "w") as f:
+                        json.dump(pids, f)
+            except Exception:
+                pass
+
             return True
         except Exception:
             traceback.print_exc()

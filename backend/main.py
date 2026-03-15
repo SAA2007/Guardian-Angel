@@ -90,8 +90,14 @@ def main():
     # ── Write PID file ──────────────────────────────────────
     pid_file = os.path.join(_project_root, "data", "guardian_angel.pid")
     os.makedirs(os.path.dirname(pid_file), exist_ok=True)
+    pid_data = {
+        "main": os.getpid(),
+        "detection": supervisor._processes["detection"].pid,
+        "overlay": supervisor._processes["overlay"].pid,
+        "audio": supervisor._processes["audio"].pid,
+    }
     with open(pid_file, "w") as f:
-        f.write(str(os.getpid()))
+        json.dump(pid_data, f)
 
     try:
         print("\n[API] Starting on http://localhost:{}".format(
