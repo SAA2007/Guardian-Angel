@@ -83,21 +83,40 @@ class NSFWDetector:
         try:
             import tempfile
 
+            # Convert BGRA/BGR to RGB for NudeNet
+            if frame.shape[2] == 4:
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGRA2RGB)
+            else:
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
             # Scale down for faster inference
-            frame_input = frame
+            frame_input = frame_rgb
             if self._detection_scale < 1.0:
-                h = int(frame.shape[0] * self._detection_scale)
-                w = int(frame.shape[1] * self._detection_scale)
+                h = int(frame_rgb.shape[0] * self._detection_scale)
+                w = int(frame_rgb.shape[1] * self._detection_scale)
                 frame_input = cv2.resize(
-                    frame, (w, h), interpolation=cv2.INTER_AREA
+                    frame_rgb, (w, h), interpolation=cv2.INTER_AREA
                 )
 
-            # NudeNet expects a file path — write to temp
-            tmp_path = os.path.join(
-                tempfile.gettempdir(), "_ga_detect.jpg"
-            )
-            cv2.imwrite(tmp_path, frame_input)
-            raw_results = self._detector.detect(tmp_path)
+            # Save first frame for debugging (one-time)
+            if not hasattr(self, '_debug_saved'):
+                self._debug_saved = True
+                project_root = os.path.dirname(
+                    os.path.dirname(
+                        os.path.dirname(os.path.abspath(__file__))
+                    )
+                )
+                debug_path = os.path.join(
+                    project_root, "data", "debug_frame.jpg"
+                )
+                cv2.imwrite(debug_path, frame)
+                if self.dev_mode:
+                    print("[DETECT] Saved debug frame to {}".format(
+                        debug_path
+                    ))
+
+            # NudeNet v3: pass numpy array directly (RGB)
+            raw_results = self._detector.detect(frame_input)
 
             # Debug: show all raw NudeNet results before filtering
             if self.dev_mode:
@@ -109,15 +128,13 @@ class NSFWDetector:
                 if confidence < self._sensitivity:
                     continue
 
+                # NudeNet v3 box format: [x, y, width, height]
                 box = det.get("box", [0, 0, 0, 0])
-                # NudeNet box format: [x1, y1, x2, y2]
-                x1, y1, x2, y2 = box
-                width = x2 - x1
-                height = y2 - y1
+                x, y, width, height = box
 
                 results.append({
-                    "x": int(x1 + monitor_offset[0]),
-                    "y": int(y1 + monitor_offset[1]),
+                    "x": int(x + monitor_offset[0]),
+                    "y": int(y + monitor_offset[1]),
                     "width": int(width),
                     "height": int(height),
                     "confidence": float(confidence),
