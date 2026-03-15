@@ -118,3 +118,9 @@
 [2026-03-15 21:33:16] PHASE:6 | FILE:start.bat | ACTION:Created start script - launches backend+frontend in separate cmd windows with 4s delay | STATUS:done
 [2026-03-15 21:33:16] PHASE:6 | FILE:stop.bat | ACTION:Created stop script - kills backend+frontend windows by title | STATUS:done
 [2026-03-15 21:33:16] PHASE:6 | FILE:README.md | ACTION:Updated phase table - Phase 6 done, Phase 7 in progress | STATUS:done
+[2026-03-15 22:12:56] PHASE:7 | FILE:frontend/src/components/ConfigPanel.jsx | ACTION:Added advanced detection config | STATUS:done
+[2026-03-15 22:12:59] PHASE:7 | FILE:backend/api/models.py | ACTION:Added detection config fields to Config models | STATUS:done
+[2026-03-15 22:13:11] PHASE:7 | FILE:backend/watchdog/lock.py, disable_flow.py, service.py | ACTION:Created watchdog persistence logic | STATUS:done
+[2026-03-15 22:13:20] PHASE:7 | FILE:backend/api/routes.py | ACTION:Added /persistence and /watchdog endpoints | STATUS:done
+[2026-03-15 22:13:24] PHASE:7 | FILE:frontend/src/components/PersistencePanel.jsx | ACTION:Created lock and disable UI | STATUS:done
+[2026-03-15 22:13:28] PHASE:7 | FILE:frontend/src/App.jsx | ACTION:Integrated PersistencePanel | STATUS:done

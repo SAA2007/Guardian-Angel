@@ -61,35 +61,44 @@ class MotionDetector:
         Always returns True on the first frame for a given monitor.
         Updates the stored previous frame after comparison.
         """
-        # If motion skip is disabled, always report motion
-        if not self._motion_skip_enabled:
+        try:
+            # If motion skip is disabled, always report motion
+            if not self._motion_skip_enabled:
+                self._prev_frames[monitor_id] = frame
+                return True
+
+            prev = self._prev_frames.get(monitor_id)
             self._prev_frames[monitor_id] = frame
-            return True
 
-        prev = self._prev_frames.get(monitor_id)
-        self._prev_frames[monitor_id] = frame
+            if prev is None:
+                return True  # first frame — nothing to compare
 
-        if prev is None:
-            return True  # first frame — nothing to compare
+            # Convert to grayscale for comparison
+            gray_a = cv2.cvtColor(prev, cv2.COLOR_BGR2GRAY)
+            gray_b = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # Convert to grayscale for comparison
-        gray_a = cv2.cvtColor(prev, cv2.COLOR_BGR2GRAY)
-        gray_b = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            # Resize to max 320px wide for speed (~2ms vs ~30ms)
+            h, w = gray_a.shape
+            scale = min(1.0, 320 / w)
+            if scale < 1.0:
+                new_size = (int(w * scale), int(h * scale))
+                gray_a = cv2.resize(
+                    gray_a, new_size, interpolation=cv2.INTER_AREA
+                )
+                gray_b = cv2.resize(
+                    gray_b, new_size, interpolation=cv2.INTER_AREA
+                )
 
-        # Resize for speed if the frame is large
-        h, w = gray_a.shape
-        if h > 480 or w > 640:
-            scale = min(480 / h, 640 / w)
-            new_size = (int(w * scale), int(h * scale))
-            gray_a = cv2.resize(gray_a, new_size)
-            gray_b = cv2.resize(gray_b, new_size)
+            if _HAS_SKIMAGE:
+                similarity = ssim(gray_a, gray_b)
+            else:
+                similarity = _numpy_similarity(gray_a, gray_b)
 
-        if _HAS_SKIMAGE:
-            similarity = ssim(gray_a, gray_b)
-        else:
-            similarity = _numpy_similarity(gray_a, gray_b)
+            return similarity < self._threshold  # True = motion detected
 
-        return similarity < self._threshold  # True = motion detected
+        except Exception as exc:
+            print("[GA-MOTION] Error: {}".format(exc))
+            return True  # assume motion on failure
 
     def reset(self, monitor_id: int | None = None) -> None:
         """Clear stored previous frames.

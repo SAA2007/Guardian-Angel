@@ -27,6 +27,9 @@ class ConfigResponse(BaseModel):
     fps_max: int = 60
     fps_min: int = 2
     fps_auto_drop: bool = True
+    detection_scale: float = 0.5
+    detection_skip_frames: int = 2
+    onnx_threads: int = 2
     audio_action: str = "silence"
     dev_mode: bool = False
 
@@ -38,6 +41,9 @@ class ConfigUpdateRequest(BaseModel):
     fps_max: Optional[int] = None
     fps_min: Optional[int] = None
     fps_auto_drop: Optional[bool] = None
+    detection_scale: Optional[float] = None
+    detection_skip_frames: Optional[int] = None
+    onnx_threads: Optional[int] = None
     audio_action: Optional[str] = None
     dev_mode: Optional[bool] = None
 

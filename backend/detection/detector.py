@@ -8,6 +8,7 @@ import json
 import os
 import traceback
 
+import cv2
 import numpy as np
 
 
@@ -29,8 +30,15 @@ class NSFWDetector:
         detection_cfg = config.get("detection", {})
 
         self._sensitivity: float = detection_cfg.get("sensitivity", 0.6)
+        self._detection_scale: float = detection_cfg.get(
+            "detection_scale", 0.5
+        )
+        self._onnx_threads: int = detection_cfg.get("onnx_threads", 2)
         self._detector = None
         self.model_loaded: bool = False
+
+        # Limit ONNX threads via environment before model load
+        os.environ["OMP_NUM_THREADS"] = str(self._onnx_threads)
 
     # ── internal ────────────────────────────────────────────────
 
@@ -72,13 +80,22 @@ class NSFWDetector:
             return []
 
         try:
-            # NudeNet expects a file path or PIL image.
-            # We save to a temp buffer to avoid disk I/O.
-            import cv2
             import tempfile
 
-            tmp_path = os.path.join(tempfile.gettempdir(), "_ga_detect.jpg")
-            cv2.imwrite(tmp_path, frame)
+            # Scale down for faster inference
+            frame_input = frame
+            if self._detection_scale < 1.0:
+                h = int(frame.shape[0] * self._detection_scale)
+                w = int(frame.shape[1] * self._detection_scale)
+                frame_input = cv2.resize(
+                    frame, (w, h), interpolation=cv2.INTER_AREA
+                )
+
+            # NudeNet expects a file path — write to temp
+            tmp_path = os.path.join(
+                tempfile.gettempdir(), "_ga_detect.jpg"
+            )
+            cv2.imwrite(tmp_path, frame_input)
             raw_results = self._detector.detect(tmp_path)
 
             results: list[dict] = []
@@ -103,10 +120,21 @@ class NSFWDetector:
                     "monitor_id": monitor_id,
                 })
 
+            # Scale coordinates back to original resolution
+            if self._detection_scale < 1.0:
+                inv = 1.0 / self._detection_scale
+                for box_dict in results:
+                    box_dict["x"] = int(box_dict["x"] * inv)
+                    box_dict["y"] = int(box_dict["y"] * inv)
+                    box_dict["width"] = int(box_dict["width"] * inv)
+                    box_dict["height"] = int(
+                        box_dict["height"] * inv
+                    )
+
             return results
 
         except Exception as exc:  # noqa: BLE001
-            print(f"[GA-ERROR] Detection failed: {exc}")
+            print("[GA-ERROR] Detection failed: {}".format(exc))
             traceback.print_exc()
             return []
 

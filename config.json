@@ -1,18 +1,21 @@
 {
-  "app_version": "0.1.0",
-  "dev_mode": false,
+  "app_version": "0.1.0-dev",
+  "dev_mode": true,
   "first_run": true,
   "detection": {
-    "sensitivity": 0.6,
-    "fps_max": 60,
-    "fps_min": 2,
-    "fps_current": 60,
+    "sensitivity": 0.5,
+    "fps_max": 5,
+    "fps_min": 1,
+    "fps_current": 30,
     "fps_auto_drop": true,
-    "motion_skip_enabled": true,
-    "motion_skip_threshold": 0.97
+    "motion_skip_enabled": false,
+    "motion_skip_threshold": 0.97,
+    "detection_scale": 0.5,
+    "detection_skip_frames": 2,
+    "onnx_threads": 2
   },
   "censor": {
-    "style": "guardian_angel",
+    "style": "blur_heavy",
     "available_styles": [
       "guardian_angel",
       "solid_black",
@@ -43,13 +46,12 @@
     "click_through": true,
     "always_on_top": true
   },
-  "persistence": {
-    "mode": false,
-    "lock_until": null,
-    "lock_indefinite": false,
-    "accountability_contact": null,
-    "watchdog_enabled": false
-  },
+  "persistence_mode": "timed",
+  "lock_duration_days": 7,
+  "lock_start": null,
+  "watchdog_enabled": true,
+  "watchdog_check_interval": 30,
+  "accountability_email": "",
   "allowlist": {
     "apps": [],
     "override_hotkey": null
@@ -106,13 +108,30 @@
     ]
   },
   "telemetry": {
-    "enabled": false,
+    "enabled": true,
     "endpoint": "https://telemetry.guardian-angel.app/v1/ingest",
-    "send_interval_minutes": 60,
+    "send_interval_minutes": 5,
     "include_trigger_count": true,
     "include_fps_metrics": true,
     "include_error_logs": true,
-    "include_device_specs": false,
+    "include_device_specs": true,
     "user_id_anonymous": null
+  },
+  "dev_tools": {
+    "enabled": true,
+    "api_docs_enabled": true,
+    "show_bounding_boxes": true,
+    "show_fps_overlay": true,
+    "show_confidence_scores": true,
+    "log_every_frame": false,
+    "log_audio_chunks": false,
+    "mock_detections": false,
+    "mock_detection_interval_ms": 2000,
+    "force_censor_style": null,
+    "benchmark_mode": false,
+    "benchmark_duration_seconds": 30,
+    "save_flagged_frames": false,
+    "flagged_frames_dir": "data/debug_frames/",
+    "api_key_override": null
   }
 }

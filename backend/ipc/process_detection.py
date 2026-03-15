@@ -63,8 +63,8 @@ def run_detection_process(shared_state, config_path):
             except Exception:
                 traceback.print_exc()
                 print("[DETECTION] Error in detection loop, "
-                      "retrying in 1s...")
-                time.sleep(1.0)
+                      "retrying in 0.1s...")
+                time.sleep(0.1)
 
     except Exception:
         traceback.print_exc()

@@ -11,8 +11,7 @@ import threading
 import time
 import traceback
 
-from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from .models import (
     AudioStatusResponse,
@@ -24,7 +23,32 @@ from .models import (
     TriggerRequest,
 )
 
+from backend.watchdog import PersistenceLock, DisableFlow, WatchdogService
+
 router = APIRouter()
+
+# Instantiate Watchdog resources globally for the routes
+_persistence_lock = None
+_watchdog_service = None
+_disable_flow = None
+
+def _init_watchdog():
+    global _persistence_lock, _watchdog_service, _disable_flow
+    if _persistence_lock is None:
+        import os
+        root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        data_dir = os.path.join(root, "data")
+        _persistence_lock = PersistenceLock(data_dir=data_dir)
+        _watchdog_service = WatchdogService()
+        _disable_flow = DisableFlow(lock=_persistence_lock, stats_manager=None) # We set stats_manager dynamically
+
+# ── Dependency Injection Models ──
+class PersistenceModeRequest(BaseModel):
+    mode: str
+    lock_duration_days: int = None
+
+class DisableAdvanceRequest(BaseModel):
+    reason: str = ""
 
 
 # ── Helpers ─────────────────────────────────────────────────────
@@ -262,6 +286,49 @@ def get_telemetry(request: Request):
     except Exception as e:
         traceback.print_exc()
         return _error_response(e)
+
+
+# ── Persistence & Watchdog ──────────────────────────────────────
+
+@router.get("/persistence/status")
+def get_persistence_status():
+    _init_watchdog()
+    return {
+        "mode": _persistence_lock.get_mode(),
+        "is_locked": _persistence_lock.is_locked(),
+        "remaining_seconds": _persistence_lock.get_remaining_seconds(),
+        "lock_start": _persistence_lock.lock_start
+    }
+
+@router.post("/persistence/start-disable")
+def start_disable_flow(request: Request):
+    _init_watchdog()
+    _, _, stats_mgr, _ = _get_deps(request)
+    _disable_flow.stats = stats_mgr
+    return _disable_flow.start()
+
+@router.get("/persistence/disable-state")
+def get_disable_state():
+    _init_watchdog()
+    return _disable_flow.get_state()
+
+@router.post("/persistence/advance")
+def advance_disable_flow(body: DisableAdvanceRequest):
+    _init_watchdog()
+    return _disable_flow.advance({"reason": body.reason})
+
+@router.post("/persistence/set-mode")
+def set_persistence_mode(body: PersistenceModeRequest):
+    _init_watchdog()
+    if body.mode not in ("off", "timed", "indefinite"):
+        return _error_response("Invalid persistence mode", 400)
+    _persistence_lock.set_mode(body.mode, body.lock_duration_days)
+    return get_persistence_status()
+
+@router.get("/watchdog/health")
+def get_watchdog_health():
+    _init_watchdog()
+    return _watchdog_service.get_health_log()
 
 
 # ── POST /quit ──────────────────────────────────────────────────

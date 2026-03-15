@@ -45,6 +45,38 @@ export async function getAudio() {
   return safeFetch(`${BASE}/audio`);
 }
 
+export async function getPersistenceStatus() {
+  return safeFetch(`${BASE}/persistence/status`);
+}
+
+export async function startDisableFlow() {
+  return safeFetch(`${BASE}/persistence/start-disable`, { method: 'POST' });
+}
+
+export async function getDisableState() {
+  return safeFetch(`${BASE}/persistence/disable-state`);
+}
+
+export async function advanceDisableFlow(payload = {}) {
+  return safeFetch(`${BASE}/persistence/advance`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+}
+
+export async function setPersistenceMode(mode, lock_duration_days = null) {
+  return safeFetch(`${BASE}/persistence/set-mode`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode, lock_duration_days })
+  });
+}
+
+export async function getWatchdogHealth() {
+  return safeFetch(`${BASE}/watchdog/health`);
+}
+
 export async function postQuit() {
   return safeFetch(`${BASE}/quit`, { method: 'POST' });
 }

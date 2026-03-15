@@ -10,6 +10,7 @@ import AngelBadge from './components/AngelBadge';
 import StatusBar from './components/StatusBar';
 import StatsPanel from './components/StatsPanel';
 import ConfigPanel from './components/ConfigPanel';
+import PersistencePanel from './components/PersistencePanel';
 
 export default function App() {
   const [status, setStatus] = useState(null);
@@ -58,7 +59,8 @@ export default function App() {
 
       {/* Main content */}
       <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <PersistencePanel />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <StatsPanel stats={stats} />
           <ConfigPanel config={config} onUpdate={handleConfigUpdate} />
         </div>

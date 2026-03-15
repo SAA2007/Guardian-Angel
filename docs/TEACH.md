@@ -118,3 +118,9 @@
 [2026-03-15 21:33:16] TEACH: Created start script - launches backend+frontend in separate cmd windows with 4s delay.
 [2026-03-15 21:33:16] TEACH: Created stop script - kills backend+frontend windows by title.
 [2026-03-15 21:33:16] TEACH: Updated phase table - Phase 6 done, Phase 7 in progress.
+[2026-03-15 22:12:56] TEACH: Added advanced detection config.
+[2026-03-15 22:12:59] TEACH: Added detection config fields to Config models.
+[2026-03-15 22:13:11] TEACH: Created watchdog persistence logic.
+[2026-03-15 22:13:20] TEACH: Added /persistence and /watchdog endpoints.
+[2026-03-15 22:13:24] TEACH: Created lock and disable UI.
+[2026-03-15 22:13:28] TEACH: Integrated PersistencePanel.

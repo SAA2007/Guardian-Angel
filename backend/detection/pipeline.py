@@ -59,10 +59,16 @@ class DetectionPipeline:
         self.fps_manager = FPSManager()
 
         config = _load_config()
+        detection_cfg = config.get("detection", {})
         self.dev_mode: bool = config.get("dev_mode", False)
+        self.skip_frames: int = detection_cfg.get(
+            "detection_skip_frames", 2
+        )
 
         self.results: dict[int, list[dict]] = {}
         self._frame_count: int = 0
+        self._frame_counter: int = 0
+        self._last_results: list[dict] = []
         self._running: bool = False
 
     # ── public API ──────────────────────────────────────────────
@@ -75,26 +81,44 @@ class DetectionPipeline:
         all_detections: list[dict] = []
         monitors = self.capture.get_monitors()
 
+        # Frame skip logic — skip NudeNet on non-skip frames
+        self._frame_counter += 1
+        run_detection = (self._frame_counter % self.skip_frames == 0)
+
+        if not run_detection:
+            return list(self._last_results)
+
         for mon in monitors:
             mid = mon["id"]
             offset = (mon["x"], mon["y"])
 
-            # 1. Capture
-            frame = self.capture.capture_frame(mid)
+            try:
+                # 1. Capture
+                frame = self.capture.capture_frame(mid)
 
-            # 2. Motion check
-            if not self.motion.has_motion(frame, mid):
+                # 2. Motion check
+                if not self.motion.has_motion(frame, mid):
+                    continue
+
+                # 3. Detection
+                detections = self.detector.detect(frame, mid, offset)
+
+                # 4. Add tier to each result
+                for det in detections:
+                    det["tier"] = self.detector.get_tier(
+                        det["width"], det["height"]
+                    )
+
+                self.results[mid] = detections
+                all_detections.extend(detections)
+
+            except Exception as exc:
+                print("[DETECTION] Monitor {} error: {}".format(
+                    mid, exc
+                ))
                 continue
 
-            # 3. Detection
-            detections = self.detector.detect(frame, mid, offset)
-
-            # 4. Add tier to each result
-            for det in detections:
-                det["tier"] = self.detector.get_tier(det["width"], det["height"])
-
-            self.results[mid] = detections
-            all_detections.extend(detections)
+        self._last_results = list(all_detections)
 
         # 5. FPS management
         self.fps_manager.tick()
