@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  --gold: #C9A84C;
+  --gold-dim: #8B7332;
+  --dark-bg: #0F0A00;
+  --dark-card: #1A1408;
+  --dark-border: #2A2010;
+  --text-primary: #F5F0E6;
+  --text-secondary: #A89B80;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--dark-bg);
+  color: var(--text-primary);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}

@@ -81,3 +81,40 @@
 [2026-03-15 20:08:16] TEACH: Created API integration test - starts supervisor+FastAPI in background thread, hits 5 GET endpoints, prints results.
 [2026-03-15 20:08:16] TEACH: Created with clean exports for create_app, ConfigManager, StatsManager.
 [2026-03-15 20:13:04] TEACH: Updated phase table - Phase 5 done, Phase 6 in progress.
+[2026-03-15 20:39:01] TEACH: Scaffolded Vite v8 + React, installed Tailwind v4 via @tailwindcss/vite, configured port 8422 + API proxy to 8421.
+[2026-03-15 20:39:01] TEACH: Created API client with 7 async functions - getStatus, getConfig, updateConfig, getStats, getOverlay, getAudio, postQuit.
+[2026-03-15 20:39:01] TEACH: Created top status bar - 3 glowing pills (Detection/Overlay/Audio) with live/dead states, FPS counter.
+[2026-03-15 20:39:01] TEACH: Created stats card - hero days_protected number, streak with flame, total/session blocked, uptime HH:MM:SS.
+[2026-03-15 20:39:01] TEACH: Created settings panel - censor style dropdown, sensitivity slider, FPS input, audio action, auto FPS/dev mode toggles.
+[2026-03-15 20:39:19] TEACH: Created decorative header - angel art from /assets/, Arabic calligraphy, Quranic reference, gold glow.
+[2026-03-15 20:39:19] TEACH: Created main dashboard - AngelBadge header, StatusBar (2s poll), two-column StatsPanel + ConfigPanel grid, themed footer.
+[2026-03-15 20:39:19] TEACH: Updated title to Guardian Angel, shield emoji favicon.
+[2026-03-15 20:39:19] TEACH: Added StaticFiles mount for assets/ directory at /assets path for angel art PNGs.
+[2026-03-15 20:39:19] TEACH: Verified npm run dev starts on port 8422 successfully - VITE v8.0.0 ready in 596ms.
+[2026-03-15 20:40:05] TEACH: Auto-dropped FPS from 60 to 55.
+[2026-03-15 20:40:08] TEACH: Auto-dropped FPS from 55 to 50.
+[2026-03-15 20:40:11] TEACH: Auto-dropped FPS from 50 to 45.
+[2026-03-15 20:40:14] TEACH: Auto-dropped FPS from 45 to 40.
+[2026-03-15 20:40:18] TEACH: Auto-dropped FPS from 40 to 35.
+[2026-03-15 20:40:21] TEACH: Auto-dropped FPS from 35 to 30.
+[2026-03-15 20:40:24] TEACH: Auto-dropped FPS from 30 to 25.
+[2026-03-15 20:40:28] TEACH: Auto-dropped FPS from 25 to 20.
+[2026-03-15 20:40:31] TEACH: Auto-dropped FPS from 20 to 15.
+[2026-03-15 20:40:34] TEACH: Auto-dropped FPS from 15 to 10.
+[2026-03-15 20:40:43] TEACH: Auto-dropped FPS from 10 to 5.
+[2026-03-15 20:46:37] TEACH: Removed Manager Lock - was crashing on Windows spawn. Manager list del+extend is already process-safe without separate lock.
+[2026-03-15 20:46:38] TEACH: Detection loop already had try/except with 1s retry - confirmed error handling is in place.
+[2026-03-15 21:27:48] TEACH: Auto-dropped FPS from 60 to 55.
+[2026-03-15 21:27:51] TEACH: Auto-dropped FPS from 55 to 50.
+[2026-03-15 21:27:54] TEACH: Auto-dropped FPS from 50 to 45.
+[2026-03-15 21:27:58] TEACH: Auto-dropped FPS from 45 to 40.
+[2026-03-15 21:28:01] TEACH: Auto-dropped FPS from 40 to 35.
+[2026-03-15 21:28:05] TEACH: Auto-dropped FPS from 35 to 30.
+[2026-03-15 21:28:08] TEACH: Auto-dropped FPS from 30 to 25.
+[2026-03-15 21:28:11] TEACH: Auto-dropped FPS from 25 to 20.
+[2026-03-15 21:28:15] TEACH: Auto-dropped FPS from 20 to 15.
+[2026-03-15 21:28:18] TEACH: Auto-dropped FPS from 15 to 10.
+[2026-03-15 21:33:16] TEACH: Replaced FPS auto-drop devlog call with print() - runtime events should not spam DEVLOG.md.
+[2026-03-15 21:33:16] TEACH: Created start script - launches backend+frontend in separate cmd windows with 4s delay.
+[2026-03-15 21:33:16] TEACH: Created stop script - kills backend+frontend windows by title.
+[2026-03-15 21:33:16] TEACH: Updated phase table - Phase 6 done, Phase 7 in progress.

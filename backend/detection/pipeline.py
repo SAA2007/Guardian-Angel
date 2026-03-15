@@ -105,10 +105,10 @@ class DetectionPipeline:
             dropped = self.fps_manager.drop_fps()
             if dropped:
                 new_fps = self.fps_manager.get_target_fps()
-                _devlog(
-                    f"PHASE:1 | FILE:pipeline.py | "
-                    f"ACTION:auto-dropped FPS from {old_fps} to {new_fps} | "
-                    f"STATUS:done"
+                print(
+                    "[FPS] Auto-dropped from {} to {}".format(
+                        old_fps, new_fps
+                    )
                 )
 
         # Dev mode console output

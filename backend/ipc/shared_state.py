@@ -12,7 +12,6 @@ Usage:
     boxes = state.get_boxes()
 """
 
-import multiprocessing
 
 
 class SharedState:
@@ -43,22 +42,23 @@ class SharedState:
         # Total detection count
         self._detection_count = manager.Value("i", 0)
 
-        # Lock for box updates
-        self._lock = manager.Lock()
+
 
     # ── Box operations ──────────────────────────────────────────
 
     def update_boxes(self, new_boxes):
-        """Replace current boxes atomically.
+        """Replace current boxes.
+
+        Manager list del+extend is already process-safe
+        without a separate lock.
 
         Args:
             new_boxes: list of box dicts, each containing
                 x, y, width, height, monitor_id, tier,
                 confidence, label.
         """
-        with self._lock:
-            del self._boxes[:]
-            self._boxes.extend(new_boxes)
+        del self._boxes[:]
+        self._boxes.extend(new_boxes)
 
     def get_boxes(self):
         """Return a copy of current bounding boxes.
@@ -66,8 +66,7 @@ class SharedState:
         Returns:
             list[dict]: copy of box list.
         """
-        with self._lock:
-            return list(self._boxes)
+        return list(self._boxes)
 
     # ── Audio trigger ───────────────────────────────────────────
 

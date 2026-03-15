@@ -9,10 +9,20 @@ Usage:
     uvicorn.run(app, host="localhost", port=8421)
 """
 
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from .routes import router
+
+
+def _project_root():
+    """Return the absolute project root path."""
+    return os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
 
 
 def create_app(supervisor, shared_state, config_manager,
@@ -57,6 +67,15 @@ def create_app(supervisor, shared_state, config_manager,
 
     # ── Include routes ──────────────────────────────────────
     app.include_router(router)
+
+    # ── Static files (assets/ for angel art PNGs) ───────────
+    assets_dir = os.path.join(_project_root(), "assets")
+    if os.path.isdir(assets_dir):
+        app.mount(
+            "/assets",
+            StaticFiles(directory=assets_dir),
+            name="assets",
+        )
 
     # ── Lifecycle hooks ─────────────────────────────────────
 

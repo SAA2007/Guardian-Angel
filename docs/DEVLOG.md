@@ -81,3 +81,40 @@
 [2026-03-15 20:08:16] PHASE:5 | FILE:test_api.py | ACTION:Created API integration test - starts supervisor+FastAPI in background thread, hits 5 GET endpoints, prints results | STATUS:done
 [2026-03-15 20:08:16] PHASE:5 | FILE:__init__.py | ACTION:Created with clean exports for create_app, ConfigManager, StatsManager | STATUS:done
 [2026-03-15 20:13:04] PHASE:5 | FILE:README.md | ACTION:Updated phase table - Phase 5 done, Phase 6 in progress | STATUS:done
+[2026-03-15 20:39:01] PHASE:6 | FILE:frontend/ | ACTION:Scaffolded Vite v8 + React, installed Tailwind v4 via @tailwindcss/vite, configured port 8422 + API proxy to 8421 | STATUS:done
+[2026-03-15 20:39:01] PHASE:6 | FILE:api.js | ACTION:Created API client with 7 async functions - getStatus, getConfig, updateConfig, getStats, getOverlay, getAudio, postQuit | STATUS:done
+[2026-03-15 20:39:01] PHASE:6 | FILE:StatusBar.jsx | ACTION:Created top status bar - 3 glowing pills (Detection/Overlay/Audio) with live/dead states, FPS counter | STATUS:done
+[2026-03-15 20:39:01] PHASE:6 | FILE:StatsPanel.jsx | ACTION:Created stats card - hero days_protected number, streak with flame, total/session blocked, uptime HH:MM:SS | STATUS:done
+[2026-03-15 20:39:01] PHASE:6 | FILE:ConfigPanel.jsx | ACTION:Created settings panel - censor style dropdown, sensitivity slider, FPS input, audio action, auto FPS/dev mode toggles | STATUS:done
+[2026-03-15 20:39:19] PHASE:6 | FILE:AngelBadge.jsx | ACTION:Created decorative header - angel art from /assets/, Arabic calligraphy, Quranic reference, gold glow | STATUS:done
+[2026-03-15 20:39:19] PHASE:6 | FILE:App.jsx | ACTION:Created main dashboard - AngelBadge header, StatusBar (2s poll), two-column StatsPanel + ConfigPanel grid, themed footer | STATUS:done
+[2026-03-15 20:39:19] PHASE:6 | FILE:index.html | ACTION:Updated title to Guardian Angel, shield emoji favicon | STATUS:done
+[2026-03-15 20:39:19] PHASE:6 | FILE:server.py | ACTION:Added StaticFiles mount for assets/ directory at /assets path for angel art PNGs | STATUS:done
+[2026-03-15 20:39:19] PHASE:6 | FILE:dev-server | ACTION:Verified npm run dev starts on port 8422 successfully - VITE v8.0.0 ready in 596ms | STATUS:done
+[2026-03-15 20:40:05] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 60 to 55 | STATUS:done
+[2026-03-15 20:40:08] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 55 to 50 | STATUS:done
+[2026-03-15 20:40:11] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 50 to 45 | STATUS:done
+[2026-03-15 20:40:14] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 45 to 40 | STATUS:done
+[2026-03-15 20:40:18] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 40 to 35 | STATUS:done
+[2026-03-15 20:40:21] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 35 to 30 | STATUS:done
+[2026-03-15 20:40:24] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 30 to 25 | STATUS:done
+[2026-03-15 20:40:28] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 25 to 20 | STATUS:done
+[2026-03-15 20:40:31] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 20 to 15 | STATUS:done
+[2026-03-15 20:40:34] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 15 to 10 | STATUS:done
+[2026-03-15 20:40:43] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 10 to 5 | STATUS:done
+[2026-03-15 20:46:37] PHASE:4 | FILE:shared_state.py | ACTION:Removed Manager Lock - was crashing on Windows spawn. Manager list del+extend is already process-safe without separate lock | STATUS:done
+[2026-03-15 20:46:38] PHASE:4 | FILE:process_detection.py | ACTION:Detection loop already had try/except with 1s retry - confirmed error handling is in place | STATUS:done
+[2026-03-15 21:27:48] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 60 to 55 | STATUS:done
+[2026-03-15 21:27:51] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 55 to 50 | STATUS:done
+[2026-03-15 21:27:54] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 50 to 45 | STATUS:done
+[2026-03-15 21:27:58] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 45 to 40 | STATUS:done
+[2026-03-15 21:28:01] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 40 to 35 | STATUS:done
+[2026-03-15 21:28:05] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 35 to 30 | STATUS:done
+[2026-03-15 21:28:08] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 30 to 25 | STATUS:done
+[2026-03-15 21:28:11] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 25 to 20 | STATUS:done
+[2026-03-15 21:28:15] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 20 to 15 | STATUS:done
+[2026-03-15 21:28:18] PHASE:1 | FILE:pipeline.py | ACTION:auto-dropped FPS from 15 to 10 | STATUS:done
+[2026-03-15 21:33:16] PHASE:1 | FILE:pipeline.py | ACTION:Replaced FPS auto-drop devlog call with print() - runtime events should not spam DEVLOG.md | STATUS:done
+[2026-03-15 21:33:16] PHASE:6 | FILE:start.bat | ACTION:Created start script - launches backend+frontend in separate cmd windows with 4s delay | STATUS:done
+[2026-03-15 21:33:16] PHASE:6 | FILE:stop.bat | ACTION:Created stop script - kills backend+frontend windows by title | STATUS:done
+[2026-03-15 21:33:16] PHASE:6 | FILE:README.md | ACTION:Updated phase table - Phase 6 done, Phase 7 in progress | STATUS:done
