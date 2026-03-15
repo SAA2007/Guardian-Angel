@@ -15,6 +15,9 @@ config.dev.json
 data/stats/
 data/telemetry/
 data/debug_frames/
+data/debug_frame.jpg
+data/*.jpg
+data/*.png
 *.db
 *.sqlite
 .DS_Store
