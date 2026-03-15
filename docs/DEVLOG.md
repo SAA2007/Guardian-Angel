@@ -129,3 +129,5 @@
 [2026-03-15 22:46:38] PHASE:7-FIX | FILE:scripts/start.bat | ACTION:Added dev mode that runs backend in same terminal for visible output | STATUS:done
 [2026-03-15 22:46:46] PHASE:7-FIX | FILE:scripts/stop.bat | ACTION:Rewrote to kill processes by port via psutil instead of window title | STATUS:done
 [2026-03-15 22:46:49] PHASE:7-FIX | FILE:data/stats/*.json | ACTION:Deleted stale session.json and cumulative.json, verified StatsManager returns all zeros | STATUS:done
+[2026-03-15 22:54:37] PHASE:7-FIX | FILE:backend/main.py | ACTION:Rewrote kill_port to use psutil.net_connections instead of process_iter | STATUS:done
+[2026-03-15 22:55:06] PHASE:7-FIX | FILE:scripts/kill_ports.py, scripts/stop.bat | ACTION:Extracted inline Python into kill_ports.py, simplified stop.bat | STATUS:done

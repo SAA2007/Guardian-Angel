@@ -24,15 +24,18 @@ sys.path.insert(0, _project_root)
 
 def kill_port(port):
     """Kill any process holding the given port."""
-    for proc in psutil.process_iter(['pid', 'connections']):
-        try:
-            for conn in proc.connections():
-                if conn.laddr.port == port:
+    try:
+        for conn in psutil.net_connections():
+            if conn.laddr.port == port and conn.pid:
+                try:
+                    proc = psutil.Process(conn.pid)
                     proc.kill()
                     time.sleep(1)
                     return True
-        except Exception:
-            continue
+                except Exception:
+                    pass
+    except Exception:
+        pass
     return False
 
 

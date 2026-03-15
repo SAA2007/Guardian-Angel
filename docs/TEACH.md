@@ -129,3 +129,5 @@
 [2026-03-15 22:46:38] TEACH: Added dev mode that runs backend in same terminal for visible output.
 [2026-03-15 22:46:46] TEACH: Rewrote to kill processes by port via psutil instead of window title.
 [2026-03-15 22:46:49] TEACH: Deleted stale session.json and cumulative.json, verified StatsManager returns all zeros.
+[2026-03-15 22:54:37] TEACH: Rewrote kill_port to use psutil.net_connections instead of process_iter.
+[2026-03-15 22:55:06] TEACH: Extracted inline Python into kill_ports.py, simplified stop.bat.
