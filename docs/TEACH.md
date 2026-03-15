@@ -141,3 +141,4 @@
 [2026-03-15 23:22:43] TEACH: Added record_event, get_recent_events, GET /stats/recent endpoint.
 [2026-03-15 23:28:24] TEACH: Fixed NudeNet v3 integration - box format [x,y,w,h] not [x1,y1,x2,y2], added BGR2RGB conversion, pass numpy array directly instead of temp file, added debug frame save.
 [2026-03-15 23:28:24] TEACH: Lowered detection sensitivity to 0.25 to match NudeNet v3 score range.
+[2026-03-15 23:33:56] TEACH: Purged sensitive screenshot from all git history via git-filter-repo, added data image patterns to .gitignore.

@@ -141,3 +141,4 @@
 [2026-03-15 23:22:43] PHASE:7-FIX | FILE:backend/api/stats_manager.py, routes.py, api.js | ACTION:Added record_event, get_recent_events, GET /stats/recent endpoint | STATUS:done
 [2026-03-15 23:28:24] PHASE:7-FIX | FILE:backend/detection/detector.py | ACTION:Fixed NudeNet v3 integration - box format [x,y,w,h] not [x1,y1,x2,y2], added BGR2RGB conversion, pass numpy array directly instead of temp file, added debug frame save | STATUS:done
 [2026-03-15 23:28:24] PHASE:7-FIX | FILE:config.json | ACTION:Lowered detection sensitivity to 0.25 to match NudeNet v3 score range | STATUS:done
+[2026-03-15 23:33:56] PHASE:7-FIX | FILE:data/debug_frame.jpg | ACTION:Purged sensitive screenshot from all git history via git-filter-repo, added data image patterns to .gitignore | STATUS:done
