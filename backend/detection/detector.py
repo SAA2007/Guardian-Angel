@@ -29,21 +29,28 @@ class NSFWDetector:
         config = _load_config()
         detection_cfg = config.get("detection", {})
 
-        self._sensitivity: float = detection_cfg.get("sensitivity", 0.6)
-        self._detection_scale: float = detection_cfg.get(
+        self._sensitivity = detection_cfg.get("sensitivity", 0.6)
+        self._detection_scale = detection_cfg.get(
             "detection_scale", 0.5
         )
-        self._onnx_threads: int = detection_cfg.get("onnx_threads", 2)
+        self._onnx_threads = detection_cfg.get("onnx_threads", 2)
+        self._box_padding = detection_cfg.get(
+            "detection_box_padding", 0.4
+        )
+        self._ignore_classes = detection_cfg.get(
+            "detection_ignore_classes", []
+        )
         self._detector = None
-        self.model_loaded: bool = False
-        self.dev_mode: bool = config.get("dev_mode", False)
+        self.model_loaded = False
+        self.dev_mode = config.get("dev_mode", False)
+        self._debug_saved = False
 
         # Limit ONNX threads via environment before model load
         os.environ["OMP_NUM_THREADS"] = str(self._onnx_threads)
 
     # ── internal ────────────────────────────────────────────────
 
-    def _ensure_loaded(self) -> None:
+    def _ensure_loaded(self):
         """Load the NudeNet model if not already loaded."""
         if self.model_loaded:
             return
@@ -52,18 +59,18 @@ class NSFWDetector:
 
             self._detector = NudeDetector()
             self.model_loaded = True
-        except Exception as exc:  # noqa: BLE001
-            print(f"[GA-ERROR] Failed to load NudeNet model: {exc}")
+        except Exception as exc:
+            print("[GA-ERROR] Failed to load NudeNet model: {}".format(exc))
             traceback.print_exc()
 
     # ── public API ──────────────────────────────────────────────
 
     def detect(
         self,
-        frame: np.ndarray,
-        monitor_id: int = 0,
-        monitor_offset: tuple[int, int] = (0, 0),
-    ) -> list[dict]:
+        frame,
+        monitor_id=0,
+        monitor_offset=(0, 0),
+    ):
         """Run NudeNet on *frame* and return filtered bounding boxes.
 
         Each result dict contains:
@@ -81,13 +88,15 @@ class NSFWDetector:
             return []
 
         try:
-            import tempfile
-
             # Convert BGRA/BGR to RGB for NudeNet
             if frame.shape[2] == 4:
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGRA2RGB)
             else:
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+            # Remember original dimensions for padding clamping
+            original_height = frame.shape[0]
+            original_width = frame.shape[1]
 
             # Scale down for faster inference
             frame_input = frame_rgb
@@ -99,7 +108,7 @@ class NSFWDetector:
                 )
 
             # Save first frame for debugging (one-time)
-            if not hasattr(self, '_debug_saved'):
+            if not self._debug_saved:
                 self._debug_saved = True
                 project_root = os.path.dirname(
                     os.path.dirname(
@@ -122,27 +131,34 @@ class NSFWDetector:
             if self.dev_mode:
                 print("[DETECT-RAW] {}".format(raw_results))
 
-            results: list[dict] = []
+            results = []
             for det in raw_results:
                 confidence = det.get("score", 0.0)
                 if confidence < self._sensitivity:
                     continue
 
+                # Filter ignored classes
+                label = det.get("class", "UNKNOWN")
+                if label in self._ignore_classes:
+                    continue
+
                 # NudeNet v3 box format: [x, y, width, height]
                 box = det.get("box", [0, 0, 0, 0])
-                x, y, width, height = box
+                raw_x, raw_y, raw_w, raw_h = box
 
                 results.append({
-                    "x": int(x + monitor_offset[0]),
-                    "y": int(y + monitor_offset[1]),
-                    "width": int(width),
-                    "height": int(height),
+                    "x": int(raw_x + monitor_offset[0]),
+                    "y": int(raw_y + monitor_offset[1]),
+                    "width": int(raw_w),
+                    "height": int(raw_h),
                     "confidence": float(confidence),
-                    "label": det.get("class", "UNKNOWN"),
+                    "label": label,
                     "monitor_id": monitor_id,
+                    "_raw": [int(raw_x), int(raw_y),
+                             int(raw_w), int(raw_h)],
                 })
 
-            # Scale coordinates back to original resolution
+            # Step 1: Scale coordinates back to original resolution
             if self._detection_scale < 1.0:
                 inv = 1.0 / self._detection_scale
                 for box_dict in results:
@@ -153,21 +169,64 @@ class NSFWDetector:
                         box_dict["height"] * inv
                     )
 
+            # Step 2: Apply padding expansion AFTER scale-back
+            pad = self._box_padding
+            if pad > 0:
+                for box_dict in results:
+                    raw_box = box_dict.pop("_raw", None)
+                    w = box_dict["width"]
+                    h = box_dict["height"]
+                    pad_x = int(w * pad)
+                    pad_y = int(h * pad)
+                    box_dict["x"] = max(0, box_dict["x"] - pad_x)
+                    box_dict["y"] = max(0, box_dict["y"] - pad_y)
+                    box_dict["width"] = min(
+                        original_width - box_dict["x"],
+                        w + pad_x * 2
+                    )
+                    box_dict["height"] = min(
+                        original_height - box_dict["y"],
+                        h + pad_y * 2
+                    )
+
+                    # Debug: show coordinate pipeline
+                    if self.dev_mode:
+                        print(
+                            "[DETECT-BOX] raw={} scaled=[{},{},{},{}]"
+                            " padded=[{},{},{},{}] on {}x{}".format(
+                                raw_box,
+                                int(box_dict["x"]),
+                                int(box_dict["y"]),
+                                int(box_dict["width"]),
+                                int(box_dict["height"]),
+                                int(box_dict["x"]),
+                                int(box_dict["y"]),
+                                int(box_dict["width"]),
+                                int(box_dict["height"]),
+                                original_width,
+                                original_height,
+                            )
+                        )
+            else:
+                # Remove internal _raw keys
+                for box_dict in results:
+                    box_dict.pop("_raw", None)
+
             return results
 
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             print("[GA-ERROR] Detection failed: {}".format(exc))
             traceback.print_exc()
             return []
 
     @staticmethod
-    def get_tier(width: int, height: int) -> str:
+    def get_tier(width, height):
         """Return size tier string based on bounding box dimensions.
 
         Tiers (from SPEC.md):
-            full   – >= 200×200
-            medium – >= 80×80
-            small  – >= 40×40
+            full   – >= 200x200
+            medium – >= 80x80
+            small  – >= 40x40
             micro  – anything smaller
         """
         if width >= 200 and height >= 200:

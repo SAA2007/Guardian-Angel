@@ -3,8 +3,8 @@
   "dev_mode": true,
   "first_run": true,
   "detection": {
-    "sensitivity": 0.25,
-    "fps_max": 10,
+    "sensitivity": 0.1,
+    "fps_max": 15,
     "fps_min": 1,
     "fps_current": 30,
     "fps_auto_drop": true,
@@ -12,10 +12,17 @@
     "motion_skip_threshold": 0.97,
     "detection_scale": 0.5,
     "detection_skip_frames": 2,
+    "detection_box_padding": 0.4,
+    "detection_ignore_classes": [
+      "BELLY_EXPOSED",
+      "FACE_FEMALE",
+      "FACE_MALE",
+      "ARMPITS_EXPOSED"
+    ],
     "onnx_threads": 2
   },
   "censor": {
-    "style": "guardian_angel",
+    "style": "pixelate",
     "available_styles": [
       "guardian_angel",
       "solid_black",

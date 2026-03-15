@@ -142,3 +142,8 @@
 [2026-03-15 23:28:24] TEACH: Fixed NudeNet v3 integration - box format [x,y,w,h] not [x1,y1,x2,y2], added BGR2RGB conversion, pass numpy array directly instead of temp file, added debug frame save.
 [2026-03-15 23:28:24] TEACH: Lowered detection sensitivity to 0.25 to match NudeNet v3 score range.
 [2026-03-15 23:33:56] TEACH: Purged sensitive screenshot from all git history via git-filter-repo, added data image patterns to .gitignore.
+[2026-03-15 23:46:04] TEACH: Added 800ms box hold mechanism to prevent flicker.
+[2026-03-15 23:46:04] TEACH: Added box padding expansion, class filter, detection coordinate debug output.
+[2026-03-15 23:46:04] TEACH: Tier-based rendering - MICRO solid gold, SMALL nur orb, letterbox aspect ratio.
+[2026-03-15 23:46:05] TEACH: Added detection_box_padding 0.4 and detection_ignore_classes.
+[2026-03-15 23:46:05] TEACH: Added box padding slider 0.0-1.0.

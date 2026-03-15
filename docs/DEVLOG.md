@@ -142,3 +142,8 @@
 [2026-03-15 23:28:24] PHASE:7-FIX | FILE:backend/detection/detector.py | ACTION:Fixed NudeNet v3 integration - box format [x,y,w,h] not [x1,y1,x2,y2], added BGR2RGB conversion, pass numpy array directly instead of temp file, added debug frame save | STATUS:done
 [2026-03-15 23:28:24] PHASE:7-FIX | FILE:config.json | ACTION:Lowered detection sensitivity to 0.25 to match NudeNet v3 score range | STATUS:done
 [2026-03-15 23:33:56] PHASE:7-FIX | FILE:data/debug_frame.jpg | ACTION:Purged sensitive screenshot from all git history via git-filter-repo, added data image patterns to .gitignore | STATUS:done
+[2026-03-15 23:46:04] PHASE:7-FIX | FILE:backend/ipc/process_overlay.py | ACTION:Added 800ms box hold mechanism to prevent flicker | STATUS:done
+[2026-03-15 23:46:04] PHASE:7-FIX | FILE:backend/detection/detector.py | ACTION:Added box padding expansion, class filter, detection coordinate debug output | STATUS:done
+[2026-03-15 23:46:04] PHASE:7-FIX | FILE:backend/overlay/renderer.py | ACTION:Tier-based rendering - MICRO solid gold, SMALL nur orb, letterbox aspect ratio | STATUS:done
+[2026-03-15 23:46:05] PHASE:7-FIX | FILE:config.json | ACTION:Added detection_box_padding 0.4 and detection_ignore_classes | STATUS:done
+[2026-03-15 23:46:05] PHASE:7-FIX | FILE:frontend/src/components/ConfigPanel.jsx | ACTION:Added box padding slider 0.0-1.0 | STATUS:done

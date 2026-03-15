@@ -41,9 +41,21 @@ def run_overlay_process(shared_state, config_path):
         renderer = OverlayRenderer()
         renderer.start()
 
+        last_boxes = []
+        last_detection_time = 0
+
         while shared_state.is_alive():
             try:
                 boxes = shared_state.get_boxes()
+                now = time.time()
+                if boxes:
+                    last_boxes = boxes
+                    last_detection_time = now
+                elif now - last_detection_time < 0.8:
+                    boxes = last_boxes  # hold last result
+                else:
+                    last_boxes = []
+                    boxes = []
                 renderer.update_boxes(boxes)
                 time.sleep(0.016)  # ~60Hz refresh
             except Exception:

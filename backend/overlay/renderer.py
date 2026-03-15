@@ -163,13 +163,24 @@ class _GuardianAngelSVG:
 
     def get_tier_image(self, tier, width, height):
         """Return a Pillow RGBA image for *tier* scaled to fit
-        *width* x *height*, or None if unavailable."""
+        *width* x *height* with aspect-ratio letterboxing."""
         tier_key = tier.lower()
         img = self._images.get(tier_key)
         if img is None:
             return None
         try:
-            return img.resize((width, height), Image.LANCZOS)
+            # Maintain aspect ratio with letterboxing
+            src_w, src_h = img.size
+            scale = min(width / src_w, height / src_h)
+            new_w = int(src_w * scale)
+            new_h = int(src_h * scale)
+            resized = img.resize((new_w, new_h), Image.LANCZOS)
+            # Create transparent canvas and paste centered
+            canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+            paste_x = (width - new_w) // 2
+            paste_y = (height - new_h) // 2
+            canvas.paste(resized, (paste_x, paste_y), resized)
+            return canvas
         except Exception:
             return None
 
@@ -500,90 +511,86 @@ class OverlayRenderer:
     def _render_guardian_angel(self, draw, rect, tier):
         """Render the Guardian Angel censor art.
 
-        Attempts to use the pre-loaded PNG tier images.  If the PNGs
-        are unavailable (files missing, Pillow error, etc.), falls
-        back to the simple gold rect + wing-shape placeholder.
+        Tier-based rendering:
+          MICRO  (<40px)  — solid gold fill only, art unreadable
+          SMALL  (40-80px) — nur orb only (white circle + gold glow)
+          MEDIUM (80-200px) — full angel art
+          FULL   (>=200px) — full angel art
         """
         bx, by, bx2, by2 = rect
         bw = bx2 - bx
         bh = by2 - by
         gold = (201, 168, 76, 240)  # #C9A84C with high alpha
         white = (255, 255, 255, 255)
+        gold_glow = (201, 168, 76, 150)
 
-        # Gold background always drawn first (visible if SVG fails)
+        # Gold background always drawn first
         draw.rectangle(rect, fill=gold)
 
-        # Try SVG art — composited on top of the gold background
+        # MICRO tier — solid gold only, no art
+        if tier == "MICRO" or (bw < 40 or bh < 40):
+            return
+
+        # SMALL tier — nur orb only (white circle + gold glow)
+        if tier == "SMALL" or (bw < 80 or bh < 80):
+            cx = bx + bw // 2
+            cy = by + bh // 2
+            orb_r = max(min(bw, bh) // 4, 4)
+            # Gold glow ring
+            draw.ellipse(
+                (cx - orb_r - 2, cy - orb_r - 2,
+                 cx + orb_r + 2, cy + orb_r + 2),
+                fill=gold_glow,
+            )
+            # White orb
+            draw.ellipse(
+                (cx - orb_r, cy - orb_r,
+                 cx + orb_r, cy + orb_r),
+                fill=white,
+            )
+            return
+
+        # MEDIUM and FULL — try PNG art with letterboxing
         if self._angel_svg.available and bw > 0 and bh > 0:
             svg_img = self._angel_svg.get(tier, bw, bh)
             if svg_img is not None:
-                # Get the canvas Image that the draw object belongs to
-                canvas = draw.im
-                # Paste the SVG image; need to access the underlying
-                # Pillow Image from ImageDraw — use _image attribute
                 try:
                     pil_canvas = draw._image
                     pil_canvas.paste(svg_img, (bx, by), svg_img)
-                    return  # SVG rendered successfully
+                    return  # art rendered successfully
                 except Exception:
                     pass  # fall through to placeholder
 
-        # ── Fallback: simple wing-shape placeholder ─────────────
+        # ── Fallback: wing-shape placeholder ─────────────
         cx = bx + bw // 2
         cy = by + bh // 2
-
-        if tier == "FULL" or tier == "MEDIUM":
-            # Wing-like chevron
-            wing_w = min(bw // 3, 60)
-            wing_h = min(bh // 3, 40)
-            # Left wing
-            draw.polygon(
-                [
-                    (cx - 2, cy - wing_h),
-                    (cx - wing_w, cy),
-                    (cx - 2, cy + wing_h // 2),
-                ],
-                fill=white,
-            )
-            # Right wing
-            draw.polygon(
-                [
-                    (cx + 2, cy - wing_h),
-                    (cx + wing_w, cy),
-                    (cx + 2, cy + wing_h // 2),
-                ],
-                fill=white,
-            )
-            # Nur orb
-            orb_r = min(bw, bh) // 8
-            draw.ellipse(
-                (cx - orb_r, cy - orb_r - wing_h, cx + orb_r, cy + orb_r - wing_h),
-                fill=white,
-            )
-        elif tier == "SMALL":
-            # Smaller wing + orb
-            wing_w = min(bw // 4, 20)
-            wing_h = min(bh // 4, 15)
-            draw.polygon(
-                [(cx, cy - wing_h), (cx - wing_w, cy), (cx, cy + wing_h // 2)],
-                fill=white,
-            )
-            draw.polygon(
-                [(cx, cy - wing_h), (cx + wing_w, cy), (cx, cy + wing_h // 2)],
-                fill=white,
-            )
-            orb_r = max(min(bw, bh) // 10, 3)
-            draw.ellipse(
-                (cx - orb_r, cy - orb_r - wing_h, cx + orb_r, cy + orb_r - wing_h),
-                fill=white,
-            )
-        else:
-            # MICRO — nur orb only
-            orb_r = max(min(bw, bh) // 4, 3)
-            draw.ellipse(
-                (cx - orb_r, cy - orb_r, cx + orb_r, cy + orb_r),
-                fill=white,
-            )
+        wing_w = min(bw // 3, 60)
+        wing_h = min(bh // 3, 40)
+        # Left wing
+        draw.polygon(
+            [
+                (cx - 2, cy - wing_h),
+                (cx - wing_w, cy),
+                (cx - 2, cy + wing_h // 2),
+            ],
+            fill=white,
+        )
+        # Right wing
+        draw.polygon(
+            [
+                (cx + 2, cy - wing_h),
+                (cx + wing_w, cy),
+                (cx + 2, cy + wing_h // 2),
+            ],
+            fill=white,
+        )
+        # Nur orb
+        orb_r = min(bw, bh) // 8
+        draw.ellipse(
+            (cx - orb_r, cy - orb_r - wing_h,
+             cx + orb_r, cy + orb_r - wing_h),
+            fill=white,
+        )
 
     def _render_blur(self, canvas, rect, radius=15):
         """Approximate gaussian blur by filling the region with a

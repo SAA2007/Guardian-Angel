@@ -113,6 +113,28 @@ export default function ConfigPanel({ config, onUpdate }) {
           />
         </div>
 
+        {/* Box Padding */}
+        <div>
+          <label style={labelStyle}>
+            Box Padding: {(config.detection_box_padding ?? 0.4).toFixed(2)}
+          </label>
+          <p className="text-xs text-gray-500 mb-2 mt-[-2px]">
+            Expands censor boxes around detected regions. Higher = more coverage.
+          </p>
+          <input
+            type="range"
+            min="0.0"
+            max="1.0"
+            step="0.05"
+            value={config.detection_box_padding ?? 0.4}
+            onChange={(e) =>
+              handleChange('detection_box_padding', parseFloat(e.target.value))
+            }
+            className="w-full"
+            style={{ accentColor: '#C9A84C' }}
+          />
+        </div>
+
         {/* Detection Scale */}
         <div>
           <label style={labelStyle}>Detection Resolution</label>
