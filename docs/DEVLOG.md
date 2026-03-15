@@ -155,3 +155,4 @@
 [2026-03-16 00:19:49] PHASE:7-FIX | FILE:frontend/src/components/ConfigPanel.jsx | ACTION:CPU threads max=16, restart detection button | STATUS:done
 [2026-03-16 00:19:49] PHASE:7-FIX | FILE:backend/detection/detector.py | ACTION:NUDENET-RAW and NUDENET-FILTERED logging in dev_mode | STATUS:done
 [2026-03-16 00:19:49] PHASE:7-FIX | FILE:config.json | ACTION:Sensitivity lowered to 0.05 for debugging | STATUS:done
+[2026-03-16 00:23:21] PHASE:7-FIX | FILE:backend/detection/detector.py,backend/detection/pipeline.py | ACTION:Reduced debug log spam - NUDENET lines only on change, GA-DEV every 30 frames, DETECT-BOX only with detections | STATUS:done

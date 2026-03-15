@@ -44,6 +44,7 @@ class NSFWDetector:
         self.model_loaded = False
         self.dev_mode = config.get("dev_mode", False)
         self._debug_saved = False
+        self._last_raw = None  # track previous raw for change-only logging
 
         # Limit ONNX threads via environment before model load
         os.environ["OMP_NUM_THREADS"] = str(self._onnx_threads)
@@ -127,8 +128,11 @@ class NSFWDetector:
             # NudeNet v3: pass numpy array directly (RGB)
             raw_results = self._detector.detect(frame_input)
 
-            # Debug: show all raw NudeNet results before filtering
-            if self.dev_mode:
+            # Debug: only print when results change from previous frame
+            raw_changed = (raw_results != self._last_raw)
+            self._last_raw = raw_results
+
+            if self.dev_mode and raw_changed:
                 print("[NUDENET-RAW] {}".format(raw_results))
 
             results = []
@@ -158,8 +162,8 @@ class NSFWDetector:
                              int(raw_w), int(raw_h)],
                 })
 
-            # B3: filtered results logging
-            if self.dev_mode:
+            # B3: filtered results logging (only when changed)
+            if self.dev_mode and raw_changed:
                 print(
                     "[NUDENET-FILTERED] "
                     "sensitivity={} kept={} of {}".format(

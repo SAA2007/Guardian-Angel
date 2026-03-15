@@ -135,8 +135,8 @@ class DetectionPipeline:
                     )
                 )
 
-        # Dev mode console output
-        if self.dev_mode:
+        # Dev mode console output (every 30 frames)
+        if self.dev_mode and self._frame_count % 30 == 0:
             actual = self.fps_manager.get_actual_fps()
             target = self.fps_manager.get_target_fps()
             print(

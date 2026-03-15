@@ -155,3 +155,4 @@
 [2026-03-16 00:19:49] TEACH: CPU threads max=16, restart detection button.
 [2026-03-16 00:19:49] TEACH: NUDENET-RAW and NUDENET-FILTERED logging in dev_mode.
 [2026-03-16 00:19:49] TEACH: Sensitivity lowered to 0.05 for debugging.
+[2026-03-16 00:23:21] TEACH: Reduced debug log spam - NUDENET lines only on change, GA-DEV every 30 frames, DETECT-BOX only with detections.
