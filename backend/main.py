@@ -10,7 +10,10 @@ Usage:
 import json
 import os
 import sys
+import time
 import traceback
+
+import psutil
 
 # Ensure project root is importable
 _project_root = os.path.dirname(
@@ -19,9 +22,29 @@ _project_root = os.path.dirname(
 sys.path.insert(0, _project_root)
 
 
+def kill_port(port):
+    """Kill any process holding the given port."""
+    for proc in psutil.process_iter(['pid', 'connections']):
+        try:
+            for conn in proc.connections():
+                if conn.laddr.port == port:
+                    proc.kill()
+                    time.sleep(1)
+                    return True
+        except Exception:
+            continue
+    return False
+
+
 def main():
     """Main entry point — starts supervisor and API server."""
     config_path = os.path.join(_project_root, "config.json")
+
+    # ── Clear stale processes on API and frontend ports ──
+    if kill_port(8421):
+        print("[MAIN] Cleared stale process on port 8421")
+    if kill_port(8422):
+        print("[MAIN] Cleared stale process on port 8422")
 
     # ── Load config ─────────────────────────────────────────
     with open(config_path, "r", encoding="utf-8") as f:

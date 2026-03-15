@@ -125,3 +125,7 @@
 [2026-03-15 22:13:24] TEACH: Created lock and disable UI.
 [2026-03-15 22:13:28] TEACH: Integrated PersistencePanel.
 [2026-03-15 22:35:20] TEACH: Fixed frontend build error and backend NameError.
+[2026-03-15 22:46:32] TEACH: Added psutil port conflict auto-kill for 8421/8422 before uvicorn start.
+[2026-03-15 22:46:38] TEACH: Added dev mode that runs backend in same terminal for visible output.
+[2026-03-15 22:46:46] TEACH: Rewrote to kill processes by port via psutil instead of window title.
+[2026-03-15 22:46:49] TEACH: Deleted stale session.json and cumulative.json, verified StatsManager returns all zeros.
