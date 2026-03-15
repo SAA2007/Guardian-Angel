@@ -1,0 +1,41 @@
+# Guardian Angel — Python dependencies
+# Core backend
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Screen capture
+mss
+
+# Windows system
+pywin32
+pyaudiowpatch
+
+# Detection
+onnxruntime
+nudenet
+
+# Audio
+silero-vad
+openai-whisper
+
+# Image processing
+pillow
+opencv-python
+scikit-image
+
+# System tray
+pystray
+
+# Utilities
+psutil
+requests
+python-dotenv
+schedule
+
+# OPTIONAL - uncomment to enable object_blur / face_blur
+# ultralytics
+# mediapipe
+
+# OPTIONAL - uncomment to enable YAMNet audio classification
+# tensorflow-hub

@@ -1,0 +1,39 @@
+<svg width="260" height="300" viewBox="0 0 260 300" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <radialGradient id="nur_f" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1"/>
+    <stop offset="30%" stop-color="#FFF8DC" stop-opacity="0.95"/>
+    <stop offset="65%" stop-color="#F5C842" stop-opacity="0.55"/>
+    <stop offset="100%" stop-color="#C9880A" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect x="0" y="0" width="260" height="300" rx="16" fill="#1C1400" stroke="#C9A84C" stroke-width="2"/>
+<rect x="6" y="6" width="248" height="288" rx="12" fill="none" stroke="#C9A84C" stroke-width="0.5" opacity="0.35"/>
+<path d="M130 118 Q48 78 16 128 Q30 178 96 162 Q114 157 130 154" fill="#C9A84C" opacity="0.14"/>
+<path d="M130 118 Q212 78 244 128 Q230 178 164 162 Q146 157 130 154" fill="#C9A84C" opacity="0.14"/>
+<path d="M130 122 Q62 90 32 132 Q44 172 108 158 Q120 155 130 152" fill="#E8C96A" opacity="0.32" stroke="#C9A84C" stroke-width="0.5"/>
+<path d="M130 122 Q198 90 228 132 Q216 172 152 158 Q140 155 130 152" fill="#E8C96A" opacity="0.32" stroke="#C9A84C" stroke-width="0.5"/>
+<path d="M130 126 Q80 104 58 136 Q68 162 116 152 Q124 150 130 149" fill="#FFF5B0" opacity="0.68" stroke="#C9A84C" stroke-width="0.6"/>
+<path d="M130 126 Q180 104 202 136 Q192 162 144 152 Q136 150 130 149" fill="#FFF5B0" opacity="0.68" stroke="#C9A84C" stroke-width="0.6"/>
+<path d="M58 136 Q52 150 57 162" fill="none" stroke="#C9A84C" stroke-width="0.5" opacity="0.45"/>
+<path d="M74 128 Q68 145 71 158" fill="none" stroke="#C9A84C" stroke-width="0.5" opacity="0.4"/>
+<path d="M90 122 Q86 140 88 154" fill="none" stroke="#C9A84C" stroke-width="0.4" opacity="0.35"/>
+<path d="M202 136 Q208 150 203 162" fill="none" stroke="#C9A84C" stroke-width="0.5" opacity="0.45"/>
+<path d="M186 128 Q192 145 189 158" fill="none" stroke="#C9A84C" stroke-width="0.5" opacity="0.4"/>
+<path d="M170 122 Q174 140 172 154" fill="none" stroke="#C9A84C" stroke-width="0.4" opacity="0.35"/>
+<circle cx="130" cy="112" r="52" fill="url(#nur_f)"/>
+<line x1="130" y1="54" x2="130" y2="42" stroke="#FFF5B0" stroke-width="1.4" opacity="0.85"/>
+<line x1="130" y1="170" x2="130" y2="178" stroke="#FFF5B0" stroke-width="0.9" opacity="0.35"/>
+<line x1="167" y1="65" x2="176" y2="56" stroke="#FFF5B0" stroke-width="1.2" opacity="0.72"/>
+<line x1="93" y1="65" x2="84" y2="56" stroke="#FFF5B0" stroke-width="1.2" opacity="0.72"/>
+<line x1="183" y1="100" x2="194" y2="96" stroke="#FFF5B0" stroke-width="1.1" opacity="0.62"/>
+<line x1="77" y1="100" x2="66" y2="96" stroke="#FFF5B0" stroke-width="1.1" opacity="0.62"/>
+<line x1="178" y1="140" x2="188" y2="147" stroke="#FFF5B0" stroke-width="0.9" opacity="0.48"/>
+<line x1="82" y1="140" x2="72" y2="147" stroke="#FFF5B0" stroke-width="0.9" opacity="0.48"/>
+<circle cx="130" cy="112" r="13" fill="#FFFFFF" opacity="0.96"/>
+<circle cx="130" cy="112" r="7" fill="#FFFFFF"/>
+<path d="M108 158 Q102 192 100 228 Q114 242 130 244 Q146 242 160 228 Q158 192 152 158 Q141 166 130 167 Q119 166 108 158Z" fill="#C9A84C" opacity="0.22" stroke="#C9A84C" stroke-width="0.5"/>
+<path d="M114 160 Q110 196 109 225 Q121 234 130 236 Q139 234 151 225 Q150 196 146 160 Q138 166 130 167 Q122 166 114 160Z" fill="#FFF5B0" opacity="0.15"/>
+<text x="130" y="268" text-anchor="middle" font-family="serif" font-size="15" fill="#E8C96A" opacity="0.94" letter-spacing="1">كِرَامًا كَاتِبِين</text>
+<text x="130" y="284" text-anchor="middle" font-family="serif" font-size="8.5" fill="#C9A84C" opacity="0.68" font-style="italic">Honourable Recorders — 82:11</text>
+</svg>

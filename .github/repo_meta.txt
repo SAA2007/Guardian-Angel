@@ -1,0 +1,14 @@
+GitHub Repository Metadata
+==========================
+
+Copy these manually into GitHub → Settings → General
+
+Description:
+  AI-powered Islamic NSFW filter for addiction recovery.
+  Real-time screen censor + audio mute. Win32 overlay
+  with guardian angel art. Python 3.11 + NudeNet.
+
+Topics:
+  nsfw-filter, addiction-recovery, islam, python,
+  windows, nudenet, whisper, overlay, content-filter,
+  mental-health, open-source

@@ -1,0 +1,118 @@
+{
+  "app_version": "0.1.0",
+  "dev_mode": false,
+  "first_run": true,
+  "detection": {
+    "sensitivity": 0.6,
+    "fps_max": 60,
+    "fps_min": 2,
+    "fps_current": 60,
+    "fps_auto_drop": true,
+    "motion_skip_enabled": true,
+    "motion_skip_threshold": 0.97
+  },
+  "censor": {
+    "style": "guardian_angel",
+    "available_styles": [
+      "guardian_angel",
+      "solid_black",
+      "solid_white",
+      "solid_custom",
+      "blur_light",
+      "blur_medium",
+      "blur_heavy",
+      "pixelate"
+    ],
+    "solid_custom_color": "#000000",
+    "show_quotes": true,
+    "quote_pool": "mixed",
+    "quote_language": "en"
+  },
+  "audio": {
+    "enabled": true,
+    "buffer_seconds": 1.0,
+    "vad_enabled": true,
+    "whisper_model": "tiny.en",
+    "yamnet_enabled": true,
+    "mute_style": "silence",
+    "bleep_frequency_hz": 1000
+  },
+  "overlay": {
+    "enabled": true,
+    "opacity": 1.0,
+    "click_through": true,
+    "always_on_top": true
+  },
+  "persistence": {
+    "mode": false,
+    "lock_until": null,
+    "lock_indefinite": false,
+    "accountability_contact": null,
+    "watchdog_enabled": false
+  },
+  "allowlist": {
+    "apps": [],
+    "override_hotkey": null
+  },
+  "ui": {
+    "language": "en",
+    "theme": "light",
+    "tray_enabled": true,
+    "browser_port": 8422
+  },
+  "stats": {
+    "enabled": true,
+    "session_start": null,
+    "total_days_protected": 0,
+    "total_triggers_video": 0,
+    "total_triggers_audio": 0,
+    "longest_streak_days": 0,
+    "current_streak_days": 0,
+    "last_trigger_timestamp": null,
+    "triggers_by_hour": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "triggers_by_day": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "telemetry": {
+    "enabled": false,
+    "endpoint": "https://telemetry.guardian-angel.app/v1/ingest",
+    "send_interval_minutes": 60,
+    "include_trigger_count": true,
+    "include_fps_metrics": true,
+    "include_error_logs": true,
+    "include_device_specs": false,
+    "user_id_anonymous": null
+  }
+}
