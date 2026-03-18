@@ -1,11 +1,11 @@
 /**
  * ConfigPanel — Settings controls
  *
- * Sends PATCH /config on every change.
+ * Uses local state for sliders to prevent snap-back.
+ * Commits on mouseup/blur, selects commit immediately.
  */
 
-import { useState } from 'react';
-import { restartDetection } from '../api';
+import { useState, useEffect, useRef } from 'react';
 
 const CENSOR_OPTIONS = [
   { value: 'guardian_angel', label: 'Guardian Angel' },
@@ -53,18 +53,39 @@ const labelStyle = {
 };
 
 export default function ConfigPanel({ config, onUpdate }) {
-  const [restarting, setRestarting] = useState(false);
+  // Local state for sliders/inputs — prevents snap-back
+  const [local, setLocal] = useState({});
+  const isDirty = useRef(false);
+
+  // Sync from API config when not dirty
+  useEffect(() => {
+    if (config && !isDirty.current) {
+      setLocal({
+        sensitivity: config.sensitivity ?? 0.1,
+        detection_box_padding: config.detection_box_padding ?? 0.4,
+        onnx_threads: config.onnx_threads ?? 4,
+        fps_max: config.fps_max ?? 10,
+      });
+    }
+  }, [config]);
 
   if (!config) return null;
 
-  function handleChange(field, value) {
-    onUpdate({ [field]: value });
+  // Slider/input: update local only
+  function handleLocalChange(key, value) {
+    isDirty.current = true;
+    setLocal((prev) => ({ ...prev, [key]: value }));
   }
 
-  async function handleRestart() {
-    setRestarting(true);
-    await restartDetection();
-    setTimeout(() => setRestarting(false), 2000);
+  // Commit on mouseup/blur — fire PATCH
+  function handleCommit(key) {
+    isDirty.current = false;
+    onUpdate({ [key]: local[key] });
+  }
+
+  // Selects/checkboxes commit immediately
+  function handleDirect(field, value) {
+    onUpdate({ [field]: value });
   }
 
   return (
@@ -92,7 +113,7 @@ export default function ConfigPanel({ config, onUpdate }) {
           <select
             style={selectStyle}
             value={config.censor_style}
-            onChange={(e) => handleChange('censor_style', e.target.value)}
+            onChange={(e) => handleDirect('censor_style', e.target.value)}
           >
             {CENSOR_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -105,7 +126,7 @@ export default function ConfigPanel({ config, onUpdate }) {
         {/* Sensitivity */}
         <div>
           <label style={labelStyle}>
-            Sensitivity: {config.sensitivity?.toFixed(2)}
+            Sensitivity: {(local.sensitivity ?? 0.1).toFixed(2)}
           </label>
           <p className="text-xs text-gray-500 mb-2 mt-[-2px]">
             0.1 = catches more (may have false positives) | 1.0 = explicit content only
@@ -115,10 +136,12 @@ export default function ConfigPanel({ config, onUpdate }) {
             min="0.1"
             max="1.0"
             step="0.05"
-            value={config.sensitivity || 0.6}
+            value={local.sensitivity ?? 0.1}
             onChange={(e) =>
-              handleChange('sensitivity', parseFloat(e.target.value))
+              handleLocalChange('sensitivity', parseFloat(e.target.value))
             }
+            onMouseUp={() => handleCommit('sensitivity')}
+            onTouchEnd={() => handleCommit('sensitivity')}
             className="w-full"
             style={{ accentColor: '#C9A84C' }}
           />
@@ -127,7 +150,7 @@ export default function ConfigPanel({ config, onUpdate }) {
         {/* Box Padding */}
         <div>
           <label style={labelStyle}>
-            Box Padding: {(config.detection_box_padding ?? 0.4).toFixed(2)}
+            Box Padding: {(local.detection_box_padding ?? 0.4).toFixed(2)}
           </label>
           <p className="text-xs text-gray-500 mb-2 mt-[-2px]">
             Expands censor boxes around detected regions. Higher = more coverage.
@@ -137,10 +160,12 @@ export default function ConfigPanel({ config, onUpdate }) {
             min="0.0"
             max="1.0"
             step="0.05"
-            value={config.detection_box_padding ?? 0.4}
+            value={local.detection_box_padding ?? 0.4}
             onChange={(e) =>
-              handleChange('detection_box_padding', parseFloat(e.target.value))
+              handleLocalChange('detection_box_padding', parseFloat(e.target.value))
             }
+            onMouseUp={() => handleCommit('detection_box_padding')}
+            onTouchEnd={() => handleCommit('detection_box_padding')}
             className="w-full"
             style={{ accentColor: '#C9A84C' }}
           />
@@ -155,7 +180,7 @@ export default function ConfigPanel({ config, onUpdate }) {
           <select
             style={selectStyle}
             value={config.detection_scale ?? 0.5}
-            onChange={(e) => handleChange('detection_scale', parseFloat(e.target.value))}
+            onChange={(e) => handleDirect('detection_scale', parseFloat(e.target.value))}
           >
             {SCALE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -174,7 +199,7 @@ export default function ConfigPanel({ config, onUpdate }) {
           <select
             style={selectStyle}
             value={config.detection_skip_frames ?? 2}
-            onChange={(e) => handleChange('detection_skip_frames', parseInt(e.target.value, 10))}
+            onChange={(e) => handleDirect('detection_skip_frames', parseInt(e.target.value, 10))}
           >
             {SKIP_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -188,57 +213,37 @@ export default function ConfigPanel({ config, onUpdate }) {
         <div>
           <label style={labelStyle}>CPU Threads</label>
           <p className="text-xs text-gray-500 mb-2 mt-[-2px]">
-            i7-8700 has 12 threads. Higher = faster detection but more CPU usage. Changes require restart.
+            i7-8700 has 12 threads. Higher = faster detection, more CPU. Takes effect on next detection cycle.
           </p>
           <input
             type="number"
             min="1"
             max="16"
             step="1"
-            value={config.onnx_threads || 2}
+            value={local.onnx_threads ?? 4}
             onChange={(e) =>
-              handleChange('onnx_threads', parseInt(e.target.value, 10))
+              handleLocalChange('onnx_threads', parseInt(e.target.value, 10))
             }
+            onBlur={() => handleCommit('onnx_threads')}
             style={{ ...selectStyle, width: '80px' }}
           />
-        </div>
-
-        {/* Restart Detection */}
-        <div>
-          <button
-            onClick={handleRestart}
-            disabled={restarting}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: restarting ? '#666' : '#C9A84C',
-              fontSize: '0.85rem',
-              cursor: restarting ? 'default' : 'pointer',
-              padding: '4px 0',
-              textDecoration: 'underline',
-            }}
-          >
-            {restarting ? 'Restarting...' : '↺ Apply & Restart Detection'}
-          </button>
-          <p className="text-xs text-gray-500 mt-1">
-            Restart detection subprocess to apply thread count and scale changes
-          </p>
         </div>
 
         {/* FPS max */}
         <div>
           <label style={labelStyle}>Max FPS</label>
           <p className="text-xs text-gray-500 mb-2 mt-[-2px]">
-            Detection frame rate target. 30 recommended for CPU-only machines
+            Detection frame rate target. 10 recommended for CPU-only machines.
           </p>
           <input
             type="number"
             min="1"
             max="60"
-            value={config.fps_max || 30}
+            value={local.fps_max ?? 10}
             onChange={(e) =>
-              handleChange('fps_max', parseInt(e.target.value, 10))
+              handleLocalChange('fps_max', parseInt(e.target.value, 10))
             }
+            onBlur={() => handleCommit('fps_max')}
             style={{ ...selectStyle, width: '80px' }}
           />
         </div>
@@ -252,7 +257,7 @@ export default function ConfigPanel({ config, onUpdate }) {
           <select
             style={selectStyle}
             value={config.audio_action}
-            onChange={(e) => handleChange('audio_action', e.target.value)}
+            onChange={(e) => handleDirect('audio_action', e.target.value)}
           >
             {AUDIO_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -269,7 +274,7 @@ export default function ConfigPanel({ config, onUpdate }) {
                 type="checkbox"
                 checked={config.fps_auto_drop || false}
                 onChange={(e) =>
-                  handleChange('fps_auto_drop', e.target.checked)
+                  handleDirect('fps_auto_drop', e.target.checked)
                 }
                 style={{ accentColor: '#C9A84C' }}
               />
@@ -288,7 +293,7 @@ export default function ConfigPanel({ config, onUpdate }) {
               <input
                 type="checkbox"
                 checked={config.dev_mode || false}
-                onChange={(e) => handleChange('dev_mode', e.target.checked)}
+                onChange={(e) => handleDirect('dev_mode', e.target.checked)}
                 style={{ accentColor: '#C9A84C' }}
               />
               <span style={{ color: '#A89B80', fontSize: '0.85rem' }}>

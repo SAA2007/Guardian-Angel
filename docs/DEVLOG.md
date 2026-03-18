@@ -177,3 +177,9 @@
 [2026-03-16 01:27:17] PHASE:4-REFACTOR | FILE:backend/main.py | ACTION:Simplified PID file to single main PID, removed multiprocessing imports | STATUS:done
 [2026-03-16 01:27:17] PHASE:4-REFACTOR | FILE:backend/ipc/test_ipc.py | ACTION:Updated to reflect threading model | STATUS:done
 [2026-03-16 01:27:17] PHASE:4-REFACTOR | FILE:scripts/kill_ports.py | ACTION:Simplified to plain-text single PID file | STATUS:done
+[2026-03-18 15:32:01] PHASE:7-FIX | FILE:frontend/src/App.jsx | ACTION:Restructured to 5-col grid layout, left (Stats+Persistence), right (Config+DetectionClasses) | STATUS:done
+[2026-03-18 15:32:01] PHASE:7-FIX | FILE:frontend/src/components/ConfigPanel.jsx | ACTION:Slider save bug fixed with localConfig pattern, removed restart button | STATUS:done
+[2026-03-18 15:32:01] PHASE:7-FIX | FILE:frontend/src/components/DetectionClassesPanel.jsx | ACTION:Rewrote toggle layout with proper flex rows and w-12 h-6 button toggles | STATUS:done
+[2026-03-18 15:32:01] PHASE:7-FIX | FILE:frontend/src/components/PersistencePanel.jsx | ACTION:Fixed LOCKED badge logic, hide disable button when off, rewrote mode descriptions | STATUS:done
+[2026-03-18 15:32:01] PHASE:7-FIX | FILE:frontend/src/components/StatsPanel.jsx | ACTION:Capped streak at days_protected, renamed total blocked to triggers blocked | STATUS:done
+[2026-03-18 15:32:02] PHASE:7-FIX | FILE:config.json | ACTION:Reset defaults fps_max=10, onnx_threads=4 for i7-8700 | STATUS:done

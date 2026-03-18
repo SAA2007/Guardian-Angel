@@ -2,7 +2,7 @@
  * DetectionClassesPanel — Toggle which NudeNet classes to censor
  *
  * Groups classes into Explicit / Suggestive / Other sections
- * with toggle switches. Calls updateConfig on change.
+ * with proper flex-row toggle switches.
  */
 
 import { updateConfig } from '../api';
@@ -40,26 +40,6 @@ const CLASS_GROUPS = [
   },
 ];
 
-const toggleTrack = {
-  position: 'relative',
-  width: '36px',
-  height: '20px',
-  borderRadius: '10px',
-  cursor: 'pointer',
-  transition: 'background 0.2s',
-  flexShrink: 0,
-};
-
-const toggleThumb = {
-  position: 'absolute',
-  top: '2px',
-  width: '16px',
-  height: '16px',
-  borderRadius: '50%',
-  background: '#fff',
-  transition: 'left 0.2s',
-};
-
 export default function DetectionClassesPanel({ config, onUpdate }) {
   if (!config) return null;
 
@@ -73,7 +53,7 @@ export default function DetectionClassesPanel({ config, onUpdate }) {
 
   return (
     <div
-      className="rounded-xl p-6 mt-6"
+      className="rounded-xl p-6"
       style={{
         background: 'linear-gradient(135deg, #1A1200 0%, #0F0A00 100%)',
         border: '1px solid #2A1F00',
@@ -87,20 +67,21 @@ export default function DetectionClassesPanel({ config, onUpdate }) {
       </h2>
 
       {CLASS_GROUPS.map((group) => (
-        <div key={group.title} className="mb-4">
-          <h3
-            className="text-xs font-medium uppercase tracking-wide mb-2"
+        <div key={group.title} className="mb-5">
+          <div
+            className="text-xs font-bold tracking-widest uppercase mt-4 mb-2"
             style={{ color: '#8B7332' }}
           >
             {group.title}
-          </h3>
-          <div className="space-y-1">
+          </div>
+          <div>
             {group.classes.map((cls) => {
               const enabled = !!classes[cls.key];
               return (
                 <div
                   key={cls.key}
-                  className="flex items-center justify-between py-1"
+                  className="flex items-center justify-between py-2"
+                  style={{ borderBottom: '1px solid rgba(139, 115, 50, 0.15)' }}
                 >
                   <span
                     className="text-sm"
@@ -108,20 +89,29 @@ export default function DetectionClassesPanel({ config, onUpdate }) {
                   >
                     {cls.label}
                   </span>
-                  <div
+                  <button
                     onClick={() => handleToggle(cls.key)}
+                    className="relative flex-shrink-0 rounded-full transition-colors duration-200"
                     style={{
-                      ...toggleTrack,
-                      background: enabled ? '#C9A84C' : '#333',
+                      width: '48px',
+                      height: '24px',
+                      backgroundColor: enabled ? '#C9A84C' : '#333',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
                     }}
                   >
-                    <div
+                    <span
+                      className="block rounded-full bg-white transition-all duration-200"
                       style={{
-                        ...toggleThumb,
-                        left: enabled ? '18px' : '2px',
+                        width: '18px',
+                        height: '18px',
+                        position: 'absolute',
+                        top: '3px',
+                        left: enabled ? '27px' : '3px',
                       }}
                     />
-                  </div>
+                  </button>
                 </div>
               );
             })}

@@ -70,6 +70,33 @@ export default function PersistencePanel() {
 
   if (!status) return null;
 
+  // Compute LOCKED badge logic
+  const isLocked =
+    (status.mode === 'timed' || status.mode === 'indefinite') &&
+    status.lock_start != null;
+
+  // Compute timed lock text
+  const daysRemaining = Math.ceil((status.remaining_seconds || 0) / 86400);
+
+  function getLockText() {
+    if (status.mode === 'off') {
+      return 'Guardian Angel is monitoring but can be stopped anytime from this dashboard.';
+    }
+    if (status.mode === 'timed') {
+      if (!status.lock_start) {
+        return 'Timed lock — not started yet.';
+      }
+      if (daysRemaining <= 0) {
+        return 'Protection active — timer complete.';
+      }
+      return `Locked for ${daysRemaining} more days.`;
+    }
+    if (status.mode === 'indefinite') {
+      return 'Locked indefinitely — complete disable flow required to stop.';
+    }
+    return '';
+  }
+
   // 1. If we are inside the disable flow, take over the screen content
   if (flowState && flowState.state !== 'DONE') {
     return (
@@ -213,21 +240,19 @@ export default function PersistencePanel() {
         <h2 className="text-lg font-semibold text-[#C9A84C]">
           🛡️ Your Guardian
         </h2>
-        {status.mode === 'off' ? (
-          <span className="px-3 py-1 bg-green-900/30 text-green-400 text-xs font-bold rounded-full border border-green-800/50">
-            UNLOCKED
-          </span>
-        ) : (
+        {isLocked ? (
           <span className="px-3 py-1 bg-red-900/30 text-red-400 text-xs font-bold rounded-full border border-red-800/50">
             LOCKED
           </span>
-        )}
+        ) : status.mode === 'timed' && !status.lock_start ? (
+          <span className="px-3 py-1 bg-yellow-900/30 text-yellow-400 text-xs font-bold rounded-full border border-yellow-800/50">
+            NOT STARTED
+          </span>
+        ) : null}
       </div>
 
       <p className="text-sm text-[#F5F0E6] mb-6">
-        {status.mode === 'off' && "Protection can be disabled anytime."}
-        {status.mode === 'timed' && `Locked for ${Math.ceil((status.remaining_seconds || 0) / 86400)} more days.`}
-        {status.mode === 'indefinite' && "Locked indefinitely — complete disable flow required to stop."}
+        {getLockText()}
       </p>
 
       {/* Mode Selector */}
@@ -243,10 +268,12 @@ export default function PersistencePanel() {
           />
           <div>
             <div className="text-[#F5F0E6] font-medium">Off</div>
-            <div className="text-xs text-gray-500">Easy to stop via dashboard. Ideal for testing.</div>
+            <div className="text-xs text-gray-500">
+              Guardian Angel is monitoring but can be stopped anytime from this dashboard.
+            </div>
           </div>
         </label>
-        
+
         <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="radio"
@@ -258,10 +285,12 @@ export default function PersistencePanel() {
           />
           <div>
             <div className="text-[#F5F0E6] font-medium">Timed (30 Days)</div>
-            <div className="text-xs text-gray-500">Cannot be disabled until timer expires.</div>
+            <div className="text-xs text-gray-500">
+              Locks Guardian Angel for 30 days. Cannot be disabled until timer expires.
+            </div>
           </div>
         </label>
-        
+
         <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="radio"
@@ -273,17 +302,22 @@ export default function PersistencePanel() {
           />
           <div>
             <div className="text-[#F5F0E6] font-medium">Indefinite</div>
-            <div className="text-xs text-gray-500">Requires 60s wait, reason, and accountability notification to stop.</div>
+            <div className="text-xs text-gray-500">
+              Maximum protection. Requires a 60-second wait, written reason, and accountability notification to disable.
+            </div>
           </div>
         </label>
       </div>
 
-      <button
-        onClick={handleStartDisable}
-        className="w-full py-3 bg-[#2A2010] text-red-400 font-semibold rounded hover:bg-[#3A2D16] border border-red-900/30 transition-colors"
-      >
-        I need a break...
-      </button>
+      {/* Only show disable button when mode is NOT off */}
+      {status.mode !== 'off' && (
+        <button
+          onClick={handleStartDisable}
+          className="w-full py-3 bg-[#2A2010] text-red-400 font-semibold rounded hover:bg-[#3A2D16] border border-red-900/30 transition-colors"
+        >
+          I need a break...
+        </button>
+      )}
     </div>
   );
 }

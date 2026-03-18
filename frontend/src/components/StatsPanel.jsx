@@ -72,7 +72,7 @@ export default function StatsPanel({ stats }) {
           style={{ backgroundColor: '#0F0A00' }}
         >
           <div className="text-2xl font-bold" style={{ color: '#F5F0E6' }}>
-            {stats.current_streak} 🔥
+            {Math.min(stats.current_streak, stats.days_protected)} 🔥
           </div>
           <div className="text-xs mt-1" style={{ color: '#A89B80' }}>
             streak
@@ -87,7 +87,7 @@ export default function StatsPanel({ stats }) {
             {stats.total_triggers}
           </div>
           <div className="text-xs mt-1" style={{ color: '#A89B80' }}>
-            total blocked
+            triggers blocked
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 /**
  * Guardian Angel — Main Dashboard App
  *
- * Single-page dashboard with live polling.
+ * Two-column dashboard grid with live polling.
  */
 
 import { useState, useEffect } from 'react';
@@ -68,14 +68,21 @@ export default function App() {
       {/* Status bar */}
       <StatusBar status={status} />
 
-      {/* Main content */}
-      <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-8">
-        <PersistencePanel />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <StatsPanel stats={stats} />
-          <ConfigPanel config={config} onUpdate={handleConfigUpdate} />
+      {/* Main content — two-column grid */}
+      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Left column (40%) — Stats + Persistence */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            <StatsPanel stats={stats} />
+            <PersistencePanel />
+          </div>
+
+          {/* Right column (60%) — Config + Detection Classes */}
+          <div className="lg:col-span-3 flex flex-col gap-6">
+            <ConfigPanel config={config} onUpdate={handleConfigUpdate} />
+            <DetectionClassesPanel config={config} onUpdate={setConfig} />
+          </div>
         </div>
-        <DetectionClassesPanel config={config} onUpdate={setConfig} />
       </main>
 
       {/* Footer */}

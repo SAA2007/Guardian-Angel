@@ -177,3 +177,9 @@
 [2026-03-16 01:27:17] TEACH: Simplified PID file to single main PID, removed multiprocessing imports.
 [2026-03-16 01:27:17] TEACH: Updated to reflect threading model.
 [2026-03-16 01:27:17] TEACH: Simplified to plain-text single PID file.
+[2026-03-18 15:32:01] TEACH: Restructured to 5-col grid layout, left (Stats+Persistence), right (Config+DetectionClasses).
+[2026-03-18 15:32:01] TEACH: Slider save bug fixed with localConfig pattern, removed restart button.
+[2026-03-18 15:32:01] TEACH: Rewrote toggle layout with proper flex rows and w-12 h-6 button toggles.
+[2026-03-18 15:32:01] TEACH: Fixed LOCKED badge logic, hide disable button when off, rewrote mode descriptions.
+[2026-03-18 15:32:01] TEACH: Capped streak at days_protected, renamed total blocked to triggers blocked.
+[2026-03-18 15:32:02] TEACH: Reset defaults fps_max=10, onnx_threads=4 for i7-8700.
